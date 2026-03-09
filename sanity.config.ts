@@ -4,6 +4,7 @@ import {defineConfig} from 'sanity'
 import {structureTool} from 'sanity/structure'
 import {visionTool} from '@sanity/vision'
 import {schemaTypes} from './sanity/schemas'
+import {ValidateEventAction} from './sanity/actions/validateEvent'
 
 const singletonTypes = new Set(['siteSettings', 'firstTimerGuide'])
 
@@ -54,9 +55,14 @@ export default defineConfig({
   },
 
   document: {
-    actions: (input, context) =>
-      singletonTypes.has(context.schemaType)
-        ? input.filter(({action}) => action && singletonActions.has(action))
-        : input,
+    actions: (input, context) => {
+      if (singletonTypes.has(context.schemaType)) {
+        return input.filter(({action}) => action && singletonActions.has(action))
+      }
+      if (context.schemaType === 'event') {
+        return [ValidateEventAction, ...input]
+      }
+      return input
+    },
   },
 })

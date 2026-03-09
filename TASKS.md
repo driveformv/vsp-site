@@ -22,18 +22,18 @@ Status: [ ] = todo, [x] = done, [~] = in progress
 
 ---
 
-## Phase 2: Port Results/Points App
+## Phase 2: Port Results/Points App [DONE]
 
 ### Dependencies to install
-- [ ] T2.1 - Install MUI v7 (@mui/material, @mui/icons-material, @emotion/react, @emotion/styled)
+- [x] T2.1 - Install MUI v7 (@mui/material, @mui/icons-material, @emotion/react, @emotion/styled)
 
 ### API Routes
-- [ ] T2.2 - Port `/api/data/route.ts` from VSP_Results_Points_app
+- [x] T2.2 - Port `/api/data/route.ts` from VSP_Results_Points_app
   - Source: `/Users/hectorsanchez/Projects/VSP_Results_Points_app/src/app/api/data/route.ts`
   - GET endpoint, query param `type=points|results`
   - Fetches from Supabase, returns JSON
   - Add CORS headers
-- [ ] T2.3 - Port `/api/sync-all/route.js` (MyRacePass cron sync)
+- [x] T2.3 - Port `/api/sync-all/route.js` (MyRacePass cron sync)
   - Source: `/Users/hectorsanchez/Projects/VSP_Results_Points_app/src/app/api/sync-all/route.js`
   - Fetches events, results, points from MyRacePass API
   - Upserts to Supabase tables (events, classes, results, points, sync_status)
@@ -42,7 +42,7 @@ Status: [ ] = todo, [x] = done, [~] = in progress
   - Env vars: SUPABASE_URL, SUPABASE_SERVICE_KEY, MYRACEPASS_API_KEY, MYRACEPASS_SCHEDULE_ID
 
 ### Pages
-- [ ] T2.4 - Port `/points/page.tsx` (replace placeholder)
+- [x] T2.4 - Port `/points/page.tsx` (replace placeholder)
   - Source: `/Users/hectorsanchez/Projects/VSP_Results_Points_app/src/app/points/page.tsx`
   - Year filter, class filter chips, driver search
   - Class name mappings (11 sponsor-branded names)
@@ -50,7 +50,7 @@ Status: [ ] = todo, [x] = done, [~] = in progress
   - Expand/collapse for 10+ drivers
   - Auto-refresh every 5 minutes
   - Preserve original positions during filtering
-- [ ] T2.5 - Port `/results/page.tsx` (replace placeholder)
+- [x] T2.5 - Port `/results/page.tsx` (replace placeholder)
   - Source: `/Users/hectorsanchez/Projects/VSP_Results_Points_app/src/app/results/page.tsx`
   - Year filter, event filter chips, driver search
   - Accordion per race, position change calculation
@@ -58,12 +58,12 @@ Status: [ ] = todo, [x] = done, [~] = in progress
   - Mobile card view, desktop table view
 
 ### Config
-- [ ] T2.6 - Add cron jobs to vercel.json
+- [x] T2.6 - Add cron jobs to vercel.json
   - `59 5 * * *` (5:59 AM UTC daily)
   - `0 12 * * *` (12:00 PM UTC daily)
   - Path: `/api/sync-all`
-- [ ] T2.7 - Add CORS headers to vercel.json for /api/* routes
-- [ ] T2.8 - Update .env.local.example with MyRacePass vars
+- [x] T2.7 - Add CORS headers to vercel.json for /api/* routes
+- [x] T2.8 - Update .env.local.example with MyRacePass vars
   - SUPABASE_SERVICE_KEY
   - MYRACEPASS_API_KEY
   - MYRACEPASS_SCHEDULE_ID=31705
@@ -75,13 +75,13 @@ Status: [ ] = todo, [x] = done, [~] = in progress
 
 ---
 
-## Phase 3: AI Event Validation (Claude SDK)
+## Phase 3: AI Event Validation [DONE] (Claude SDK)
 
 ### Install
-- [ ] T3.1 - Install @anthropic-ai/sdk
+- [x] T3.1 - Install @anthropic-ai/sdk
 
 ### API Route
-- [ ] T3.2 - Create `/api/validate-event/route.ts`
+- [x] T3.2 - Create `/api/validate-event/route.ts`
   - POST endpoint, receives event JSON from Sanity Studio
   - Calculates day name from date
   - Sends prompt to claude-haiku-4-5-20251001
@@ -90,17 +90,17 @@ Status: [ ] = todo, [x] = done, [~] = in progress
   - Env var: ANTHROPIC_API_KEY (server-side only)
 
 ### Sanity Action
-- [ ] T3.3 - Create `sanity/actions/validateEvent.ts`
+- [x] T3.3 - Create `sanity/actions/validateEvent.ts`
   - "Validate Event" button in Sanity Studio toolbar
   - Calls /api/validate-event with draft or published doc
   - Shows toast notifications (green=good, yellow=warning, red=error)
   - Loading state while validating
 
 ### Config
-- [ ] T3.4 - Register ValidateEventAction in sanity.config.ts
+- [x] T3.4 - Register ValidateEventAction in sanity.config.ts
   - Only on event documents (schemaType === 'event')
   - Prepend to existing actions array
-- [ ] T3.5 - Add ANTHROPIC_API_KEY to .env.local.example
+- [x] T3.5 - Add ANTHROPIC_API_KEY to .env.local.example
 - [ ] T3.6 - Set ANTHROPIC_API_KEY in Vercel env vars
 - [ ] T3.7 - Test: create event with wrong day/date, validation catches it
 - [ ] T3.8 - Test: create valid event, validation passes
