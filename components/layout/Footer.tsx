@@ -1,5 +1,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
+import vspLogo from '@/public/vsp-logo.jpg';
+import footerBg from '@/public/footer-bg.jpg';
 
 interface FooterProps {
   phone?: string;
@@ -59,7 +61,7 @@ export default function Footer({
     <footer className="relative overflow-hidden">
       {/* Background image */}
       <Image
-        src="/footer-bg.jpg"
+        src={footerBg}
         alt=""
         fill
         className="object-cover"
@@ -73,7 +75,7 @@ export default function Footer({
           <div className="text-center md:text-left">
             <Link href="/">
               <Image
-                src="/vsp-logo.jpg"
+                src={vspLogo}
                 alt="Vado Speedway Park"
                 width={160}
                 height={160}
