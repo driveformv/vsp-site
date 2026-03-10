@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 
 interface FooterProps {
   phone?: string;
@@ -57,9 +58,12 @@ export default function Footer({
   return (
     <footer className="relative overflow-hidden">
       {/* Background image */}
-      <div
-        className="absolute inset-0 bg-cover bg-center"
-        style={{ backgroundImage: 'url(/footer-bg.jpg)' }}
+      <Image
+        src="/footer-bg.jpg"
+        alt=""
+        fill
+        className="object-cover"
+        sizes="100vw"
       />
       <div className="absolute inset-0 bg-black/80" />
 
@@ -68,9 +72,11 @@ export default function Footer({
           {/* Logo */}
           <div className="text-center md:text-left">
             <Link href="/">
-              <img
+              <Image
                 src="/vsp-logo.jpg"
                 alt="Vado Speedway Park"
+                width={160}
+                height={160}
                 className="h-16 w-auto mx-auto md:mx-0"
               />
             </Link>

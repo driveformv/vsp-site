@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { sanityFetch } from '@/sanity/lib/fetch';
 import { upcomingEventsQuery, latestNewsQuery, sponsorsQuery, siteSettingsQuery } from '@/sanity/lib/queries';
 import { urlFor } from '@/sanity/lib/image';
@@ -240,9 +241,12 @@ export default async function HomePage() {
 
       {/* ── Email Signup / Fan Program ── */}
       <section className="relative overflow-hidden">
-        <div
-          className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: 'url(/signup-bg.jpg)' }}
+        <Image
+          src="/signup-bg.jpg"
+          alt=""
+          fill
+          className="object-cover"
+          sizes="100vw"
         />
         <div className="absolute inset-0 bg-black/60" />
         <div className="relative z-10 mx-auto max-w-[1280px] px-6 py-20">

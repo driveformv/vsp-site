@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 interface NavLink {
   label: string;
@@ -72,10 +73,13 @@ export default function StickyNav({
         <div className="mx-auto flex items-center justify-between px-6 py-3" style={{ maxWidth: 1280 }}>
           {/* Logo */}
           <Link href="/" className="shrink-0">
-            <img
+            <Image
               src="/vsp-logo.jpg"
               alt="Vado Speedway Park"
+              width={120}
+              height={120}
               className="h-12 w-auto"
+              priority
             />
           </Link>
 

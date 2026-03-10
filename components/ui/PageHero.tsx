@@ -1,4 +1,5 @@
 import { ReactNode } from 'react';
+import Image from 'next/image';
 
 interface PageHeroProps {
   title: string;
@@ -30,9 +31,13 @@ export function PageHero({
         </video>
       )}
       {backgroundImage && !videoUrl && (
-        <div
-          className="absolute inset-0 h-full w-full bg-cover bg-center"
-          style={{ backgroundImage: `url(${backgroundImage})` }}
+        <Image
+          src={backgroundImage}
+          alt=""
+          fill
+          className="object-cover"
+          sizes="100vw"
+          priority
         />
       )}
 
