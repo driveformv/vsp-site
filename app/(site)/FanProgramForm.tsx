@@ -1,7 +1,6 @@
 'use client';
 
 import { FormEvent, useState } from 'react';
-import { FormBlock } from '@/components/ui';
 
 export default function FanProgramForm() {
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
@@ -14,8 +13,8 @@ export default function FanProgramForm() {
     const data = {
       name: (form.elements.namedItem('name') as HTMLInputElement).value,
       email: (form.elements.namedItem('email') as HTMLInputElement).value,
-      phone: (form.elements.namedItem('phone') as HTMLInputElement).value,
-      interests: (form.elements.namedItem('interests') as HTMLTextAreaElement).value,
+      phone: '',
+      interests: '',
     };
 
     try {
@@ -38,12 +37,9 @@ export default function FanProgramForm() {
 
   if (status === 'success') {
     return (
-      <div className="rounded-lg border border-[var(--color-border)] p-6 text-center">
-        <p className="text-sm font-semibold text-[var(--color-text)]">You are signed up.</p>
-        <p className="mt-1 text-sm text-[var(--color-text-muted)]">
-          Expect exclusive updates, promotions, and early access to special event tickets.
-        </p>
-      </div>
+      <p className="text-sm font-semibold text-white">
+        You are signed up. Expect exclusive updates soon.
+      </p>
     );
   }
 
@@ -54,29 +50,30 @@ export default function FanProgramForm() {
           Something went wrong. Please try again.
         </p>
       )}
-      <FormBlock
-        onSubmit={handleSubmit}
-        submitLabel={status === 'loading' ? 'Joining...' : 'Join Fan Program'}
-      >
-        <div className="grid gap-5 sm:grid-cols-2">
-          <div>
-            <label htmlFor="fanName">Name</label>
-            <input id="fanName" name="name" type="text" placeholder="Your name" required />
-          </div>
-          <div>
-            <label htmlFor="fanEmail">Email</label>
-            <input id="fanEmail" name="email" type="email" placeholder="email@example.com" required />
-          </div>
-        </div>
-        <div>
-          <label htmlFor="fanPhone">Phone (optional)</label>
-          <input id="fanPhone" name="phone" type="tel" placeholder="(555) 555-5555" />
-        </div>
-        <div>
-          <label htmlFor="interests">What interests you? (optional)</label>
-          <textarea id="interests" name="interests" rows={3} placeholder="Special events, behind-the-scenes access, driver meetups..." />
-        </div>
-      </FormBlock>
+      <form onSubmit={handleSubmit} className="flex flex-col gap-3 sm:flex-row">
+        <input
+          name="name"
+          type="text"
+          placeholder="Your name"
+          required
+          className="flex-1 rounded border border-white/20 bg-white/10 px-4 py-3 text-sm text-white outline-none transition-colors placeholder:text-white/50 focus:border-white/60"
+        />
+        <input
+          name="email"
+          type="email"
+          placeholder="Your email address"
+          required
+          className="flex-1 rounded border border-white/20 bg-white/10 px-4 py-3 text-sm text-white outline-none transition-colors placeholder:text-white/50 focus:border-white/60"
+        />
+        <button
+          type="submit"
+          disabled={status === 'loading'}
+          className="whitespace-nowrap rounded bg-[var(--color-accent)] px-6 py-3 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:bg-red-700 disabled:opacity-50"
+          style={{ fontFamily: 'var(--font-display)' }}
+        >
+          {status === 'loading' ? 'Joining...' : 'Sign Up'}
+        </button>
+      </form>
     </>
   );
 }

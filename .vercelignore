@@ -1,0 +1,6 @@
+wp-media/
+data/
+scripts/
+wp-content-inventory/
+*.docx
+*.jpg

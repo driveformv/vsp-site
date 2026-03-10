@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { sanityFetch } from '@/sanity/lib/fetch';
-import { upcomingEventsQuery, newsPostsQuery, sponsorsQuery, siteSettingsQuery } from '@/sanity/lib/queries';
+import { upcomingEventsQuery, latestNewsQuery, sponsorsQuery, siteSettingsQuery } from '@/sanity/lib/queries';
 import { urlFor } from '@/sanity/lib/image';
 import {
   PageHero,
@@ -11,7 +11,6 @@ import {
   SponsorStrip,
   CTABanner,
 } from '@/components/ui';
-import EmailSignup from './EmailSignup';
 import FanProgramForm from './FanProgramForm';
 import { LocalBusinessJsonLd } from '@/components/seo/JsonLd';
 
@@ -52,7 +51,7 @@ interface SiteSettings {
 export default async function HomePage() {
   const [events, posts, sponsors, settings] = await Promise.all([
     sanityFetch<SanityEvent[]>({ query: upcomingEventsQuery, tags: ['event'] }),
-    sanityFetch<SanityNewsPost[]>({ query: newsPostsQuery, tags: ['newsPost'] }),
+    sanityFetch<SanityNewsPost[]>({ query: latestNewsQuery, tags: ['newsPost'] }),
     sanityFetch<SanitySponsor[]>({ query: sponsorsQuery, tags: ['sponsor'] }),
     sanityFetch<SiteSettings | null>({ query: siteSettingsQuery, tags: ['siteSettings'] }),
   ]);
@@ -92,6 +91,8 @@ export default async function HomePage() {
       <PageHero
         title="Fuel Your Passion for Speed"
         subtitle="New Mexico's Premier Dirt Track Racing Venue"
+        videoUrl="/hero-video.mp4"
+        backgroundImage="/hero-bg.jpg"
       >
         <a
           href={ticketUrl}
@@ -212,26 +213,20 @@ export default async function HomePage() {
         </div>
       </SectionBlock>
 
-      {/* Fan Program */}
-      <SectionBlock variant="white">
-        <h2
-          className="section-title-accent mb-4 text-2xl font-bold uppercase tracking-tight text-[var(--color-text)] md:text-3xl"
-          style={{ fontFamily: 'var(--font-display)' }}
-        >
-          Fan Program
-        </h2>
-        <p className="mb-6 max-w-3xl text-sm text-[var(--color-text-muted)]">
-          Join the Vado Speedway Park Fan Program for exclusive updates, promotions,
-          and early access to special event tickets.
-        </p>
-        <div className="max-w-xl">
+      {/* Email Signup / Fan Program */}
+      <SectionBlock variant="dark">
+        <div className="mx-auto max-w-3xl text-center">
+          <h2
+            className="mb-3 text-2xl font-bold uppercase tracking-tight text-white md:text-3xl"
+            style={{ fontFamily: 'var(--font-display)' }}
+          >
+            Stay in the Loop
+          </h2>
+          <p className="mb-6 text-sm text-white/70">
+            Sign up for exclusive updates, promotions, and early access to special event tickets.
+          </p>
           <FanProgramForm />
         </div>
-      </SectionBlock>
-
-      {/* Email Signup */}
-      <SectionBlock variant="grey">
-        <EmailSignup />
       </SectionBlock>
     </>
   );

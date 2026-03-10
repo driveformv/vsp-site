@@ -4,43 +4,16 @@ Status: [ ] = todo, [x] = done, [~] = in progress
 
 ---
 
-## PENDING - Needs Hector's Action
+## COMPLETED - Credentials & Migration (2026-03-10)
 
-These items are blocked. Everything else that can be done without credentials IS done.
+All credentials set in .env.local and pushed to Vercel (production, preview, development).
+All WordPress content exported and imported to Sanity. Media download complete.
+Site deployed to Vercel: https://vsp-site-mvt-marketing.vercel.app
 
-### Credentials Needed (add to .env.local + Vercel dashboard)
-1. **SSH key for Kinsta** - No key configured for `vadospeedwaypark@34.174.186.154:24029`. Need to add SSH key or provide password. Blocks: media download (T6.1b) and WordPress data export (T7.1c, T7.3b)
-2. **Sanity write token** - Create at https://www.sanity.io/manage/project/jsftjck0/api#tokens (needs "Editor" role). Add as `SANITY_TOKEN` in .env.local. Blocks: all content imports (T7.2, T7.4, T7.6-T7.10)
-3. **Resend API key** - Sign up at https://resend.com, create API key. Add as `RESEND_API_KEY` in .env.local + Vercel. Also set `ADMIN_EMAIL` (where form notifications go). Blocks: email confirmations (T5.13)
-4. **Anthropic API key** - From https://console.anthropic.com. Add as `ANTHROPIC_API_KEY`. Blocks: AI event validation (T3.6)
-5. **MyRacePass API key** - Get from MyRacePass account. Add as `MYRACEPASS_API_KEY`. Blocks: results/points sync (T2.9-T2.13)
-
-### Dashboard Tasks (manual, no code needed)
-6. **Set Vercel env vars** (T2.9) - Push all keys from .env.local to Vercel: `vercel env add` or dashboard at https://vercel.com/mvt-marketing/vsp-site/settings/environment-variables
-7. **Sanity webhook** (T4.21) - In Sanity dashboard, create webhook pointing to Vercel deploy hook URL. Triggers rebuild on content publish.
-8. **Sanity Studio CORS** - Add production domain to CORS origins at https://www.sanity.io/manage/project/jsftjck0/api
-
-### After Credentials Are Set - Run These Commands
-```bash
-# 1. Download WordPress media (9.3 GB) - needs SSH key
-./scripts/download-media.sh --dry-run   # preview first
-./scripts/download-media.sh             # actual download
-
-# 2. Export WordPress data as JSON - needs SSH key
-./scripts/export-wordpress.sh --all     # creates data/wp-events.json, wp-posts.json, wp-sponsors.json
-
-# 3. Import into Sanity - needs SANITY_TOKEN
-SANITY_TOKEN=sk-... npx tsx scripts/import-events.ts data/wp-events.json
-SANITY_TOKEN=sk-... npx tsx scripts/import-news.ts data/wp-posts.json
-SANITY_TOKEN=sk-... npx tsx scripts/import-sponsors.ts data/wp-sponsors.json
-
-# 4. Upload media - needs SANITY_TOKEN
-SANITY_TOKEN=sk-... npx tsx scripts/upload-to-sanity.ts --dry-run
-SANITY_TOKEN=sk-... npx tsx scripts/upload-to-sanity.ts
-
-# 5. Verify everything
-npm run build   # should be zero errors
-```
+### Remaining Dashboard Tasks
+1. **Sanity webhook** (T4.21) - In Sanity dashboard, create webhook pointing to Vercel deploy hook URL
+2. **Sanity Studio CORS** - Add production domain to CORS origins at https://www.sanity.io/manage/project/jsftjck0/api
+3. **Vercel Deployment Protection** - Disable or configure for public access
 
 ### DNS Cutover (do last, after QA)
 - Point vadospeedwaypark.com A record to 76.76.21.21
@@ -112,7 +85,7 @@ npm run build   # should be zero errors
   - SUPABASE_SERVICE_KEY
   - MYRACEPASS_API_KEY
   - MYRACEPASS_SCHEDULE_ID=31705
-- [ ] T2.9 - Set environment variables in Vercel dashboard
+- [x] T2.9 - Set environment variables in Vercel dashboard (all pushed 2026-03-10)
 - [ ] T2.10 - Test: /api/data?type=points returns data
 - [ ] T2.11 - Test: /api/data?type=results returns data
 - [ ] T2.12 - Test: /points page renders with real data
@@ -146,7 +119,7 @@ npm run build   # should be zero errors
   - Only on event documents (schemaType === 'event')
   - Prepend to existing actions array
 - [x] T3.5 - Add ANTHROPIC_API_KEY to .env.local.example
-- [ ] T3.6 - Set ANTHROPIC_API_KEY in Vercel env vars
+- [x] T3.6 - Set ANTHROPIC_API_KEY in Vercel env vars (pushed 2026-03-10)
 - [ ] T3.7 - Test: create event with wrong day/date, validation catches it
 - [ ] T3.8 - Test: create valid event, validation passes
 
@@ -213,14 +186,14 @@ npm run build   # should be zero errors
 - [x] T5.10 - Run SQL migration via Supabase CLI (all 6 tables live, verified 200)
 - [x] T5.11 - Created .env.local with Supabase keys (Resend/Anthropic/Sanity tokens still needed)
 - [x] T5.12 - Tested all 6 forms end-to-end: API returns success, data confirmed in Supabase
-- [ ] T5.13 - Set RESEND_API_KEY and ADMIN_EMAIL in Vercel env vars (email sending requires Resend account)
+- [x] T5.13 - Set RESEND_API_KEY and ADMIN_EMAIL in Vercel env vars (pushed 2026-03-10)
 
 ---
 
 ## Phase 6: Media Migration
 
 - [x] T6.1 - Write download-media.sh script (rsync over SSH, port 24029, dry-run support)
-- [ ] T6.1b - Run download-media.sh to pull 9.3 GB from Kinsta
+- [x] T6.1b - Run download-media.sh to pull 9.3 GB from Kinsta (61,525 files, 8.8 GB downloaded 2026-03-10)
 - [x] T6.2 - Write upload-to-sanity.ts script (categorize + upload to Sanity CDN / Supabase Storage)
 - [ ] T6.3 - Run upload script to push images to Sanity CDN
 - [ ] T6.4 - Upload bulk race photos to Supabase Storage (race-photos/{year}/{event-slug}/)
@@ -234,12 +207,13 @@ npm run build   # should be zero errors
 
 - [x] T7.1 - Write event import script (scripts/import-events.ts)
 - [x] T7.1b - Write WordPress export script (scripts/export-wordpress.sh)
-- [ ] T7.1c - Run export-wordpress.sh --events to get events.json
-- [ ] T7.2 - Run import-events.ts to push events to Sanity
+- [x] T7.1c - Run export-wordpress.sh --events to get events.json (225 events exported 2026-03-10)
+- [x] T7.2 - Run import-events.ts to push events to Sanity (225 created, 0 errors)
 - [x] T7.3 - Write news post import script (scripts/import-news.ts, strips Divi shortcodes)
-- [ ] T7.3b - Run export-wordpress.sh --posts to get posts.json
-- [ ] T7.4 - Run import-news.ts to push news posts to Sanity
+- [x] T7.3b - Run export-wordpress.sh --posts to get posts.json (778 posts via WP-CLI bulk export)
+- [x] T7.4 - Run import-news.ts to push news posts to Sanity (778 created, 0 errors)
 - [x] T7.5 - Write sponsor import script (scripts/import-sponsors.ts)
+- [x] T7.5b - Run import-sponsors.ts to push sponsors to Sanity (47 created with logos, 0 errors)
 - [ ] T7.6 - Migrate About, FAQ, Rules, Suites page content into Sanity
 - [ ] T7.7 - Create race class entries in Sanity (with sponsor names, rules PDFs)
 - [ ] T7.8 - Set up navigation items in Sanity
