@@ -59,8 +59,11 @@ export async function generateMetadata({
 
 export async function generateStaticParams() {
   const slugs = await sanityFetch<string[]>({ query: newsPostSlugsQuery, tags: ['newsPost'] });
-  return (slugs || []).map((slug) => ({ slug }));
+  // Pre-render only recent 20 posts; rest generated on-demand via ISR
+  return (slugs || []).slice(0, 20).map((slug) => ({ slug }));
 }
+
+export const dynamicParams = true;
 
 export default async function NewsArticlePage({
   params,
