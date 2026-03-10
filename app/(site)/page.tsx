@@ -6,10 +6,8 @@ import {
   PageHero,
   SectionBlock,
   EventCard,
-  NewsCard,
   NewsListItem,
   SponsorStrip,
-  CTABanner,
 } from '@/components/ui';
 import FanProgramForm from './FanProgramForm';
 import { LocalBusinessJsonLd } from '@/components/seo/JsonLd';
@@ -56,14 +54,14 @@ export default async function HomePage() {
     sanityFetch<SiteSettings | null>({ query: siteSettingsQuery, tags: ['siteSettings'] }),
   ]);
 
-  const upcomingEvents = (events || []).slice(0, 3).map((e) => ({
+  const upcomingEvents = (events || []).slice(0, 6).map((e) => ({
     title: e.title,
     date: e.date,
     classes: (e.raceClasses || []).map((c) => c.className),
     gateTime: e.gateTime,
     raceTime: e.raceTime,
     ticketLink: e.ticketLink,
-    image: e.image ? urlFor(e.image).width(640).height(360).url() : undefined,
+    image: e.image ? urlFor(e.image).width(640).height(853).url() : undefined,
     slug: e.slug.current,
   }));
 
@@ -72,7 +70,7 @@ export default async function HomePage() {
     category: p.category || 'News',
     date: p.publishDate || '',
     excerpt: p.excerpt || '',
-    image: p.featuredImage ? urlFor(p.featuredImage).width(640).height(400).url() : undefined,
+    image: p.featuredImage ? urlFor(p.featuredImage).width(320).height(200).url() : undefined,
     slug: p.slug.current,
   }));
 
@@ -88,9 +86,11 @@ export default async function HomePage() {
   return (
     <>
       <LocalBusinessJsonLd />
+
+      {/* ── Hero ── */}
       <PageHero
-        title="Fuel Your Passion for Speed"
-        subtitle="New Mexico's Premier Dirt Track Racing Venue"
+        title="Vado Speedway Park"
+        subtitle="Fuel Your Passion for Speed at Vado Speedway Park"
         videoUrl="/hero-video.mp4"
         backgroundImage="/hero-bg.jpg"
       >
@@ -98,7 +98,7 @@ export default async function HomePage() {
           href={ticketUrl}
           target={ticketUrl.startsWith('http') ? '_blank' : undefined}
           rel={ticketUrl.startsWith('http') ? 'noopener noreferrer' : undefined}
-          className="rounded border-2 border-white px-6 py-3 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:bg-white/10"
+          className="rounded border-2 border-white px-8 py-3 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:bg-white hover:text-black"
           style={{ fontFamily: 'var(--font-display)' }}
         >
           Buy Tickets
@@ -107,36 +107,38 @@ export default async function HomePage() {
           href="https://maps.google.com/?q=Vado+Speedway+Park"
           target="_blank"
           rel="noopener noreferrer"
-          className="rounded border border-white/40 px-6 py-3 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:bg-white/10"
+          className="rounded border-2 border-white px-8 py-3 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:bg-white hover:text-black"
           style={{ fontFamily: 'var(--font-display)' }}
         >
           Get Directions
         </a>
       </PageHero>
 
-      {/* Upcoming Events */}
-      <SectionBlock variant="grey">
+      {/* ── Upcoming Events ── */}
+      <SectionBlock variant="white">
         <h2
-          className="section-title-accent mb-8 text-2xl font-bold uppercase tracking-tight text-[var(--color-text)] md:text-3xl"
+          className="mb-10 text-center text-3xl font-bold uppercase tracking-tight text-[var(--color-text)] md:text-4xl"
           style={{ fontFamily: 'var(--font-display)' }}
         >
           Upcoming Events
         </h2>
         {upcomingEvents.length > 0 ? (
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {upcomingEvents.map((event) => (
-              <EventCard key={event.slug} {...event} />
-            ))}
+          <div className="relative">
+            <div className="flex gap-6 overflow-x-auto pb-4 scrollbar-hide md:justify-center">
+              {upcomingEvents.map((event) => (
+                <EventCard key={event.slug} {...event} />
+              ))}
+            </div>
           </div>
         ) : (
-          <p className="text-sm text-[var(--color-text-muted)]">
+          <p className="text-center text-sm text-[var(--color-text-muted)]">
             No upcoming events scheduled. Check back soon.
           </p>
         )}
         <div className="mt-8 text-center">
           <Link
             href="/events"
-            className="text-sm font-semibold uppercase tracking-wider text-[var(--color-accent)] transition-colors hover:text-red-700"
+            className="inline-block rounded bg-[var(--color-accent)] px-8 py-3 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:bg-red-700"
             style={{ fontFamily: 'var(--font-display)' }}
           >
             View Full Schedule
@@ -144,16 +146,52 @@ export default async function HomePage() {
         </div>
       </SectionBlock>
 
-      {/* Latest News */}
+      {/* ── Sponsor Strip ── */}
+      {sponsorList.length > 0 && (
+        <section className="border-y border-[var(--color-border)] bg-white">
+          <div className="mx-auto max-w-[1280px] px-6 py-6">
+            <div className="flex items-center gap-8 overflow-x-auto scrollbar-hide">
+              {sponsorList.slice(0, 10).map((sponsor) => (
+                sponsor.url ? (
+                  <a
+                    key={sponsor.name}
+                    href={sponsor.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex shrink-0 items-center"
+                    title={sponsor.name}
+                  >
+                    <img
+                      src={sponsor.logo}
+                      alt={sponsor.name}
+                      className="h-8 max-w-[120px] object-contain grayscale transition-all hover:grayscale-0 md:h-10 md:max-w-[140px]"
+                    />
+                  </a>
+                ) : (
+                  <div key={sponsor.name} className="flex shrink-0 items-center" title={sponsor.name}>
+                    <img
+                      src={sponsor.logo}
+                      alt={sponsor.name}
+                      className="h-8 max-w-[120px] object-contain grayscale transition-all hover:grayscale-0 md:h-10 md:max-w-[140px]"
+                    />
+                  </div>
+                )
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ── Latest News ── */}
       <SectionBlock variant="white">
         <h2
-          className="section-title-accent mb-8 text-2xl font-bold uppercase tracking-tight text-[var(--color-text)] md:text-3xl"
+          className="mb-10 text-center text-3xl font-bold uppercase tracking-tight text-[var(--color-text)] md:text-4xl"
           style={{ fontFamily: 'var(--font-display)' }}
         >
           Latest News
         </h2>
         {latestNews.length > 0 ? (
-          <div className="divide-y divide-[var(--color-border)]">
+          <div className="mx-auto max-w-3xl divide-y divide-[var(--color-border)]">
             {latestNews.map((article) => (
               <NewsListItem
                 key={article.slug}
@@ -161,11 +199,13 @@ export default async function HomePage() {
                 date={article.date}
                 image={article.image}
                 slug={article.slug}
+                category={article.category}
+                excerpt={article.excerpt}
               />
             ))}
           </div>
         ) : (
-          <p className="text-sm text-[var(--color-text-muted)]">
+          <p className="text-center text-sm text-[var(--color-text-muted)]">
             No news posts yet.
           </p>
         )}
@@ -180,54 +220,32 @@ export default async function HomePage() {
         </div>
       </SectionBlock>
 
-      <CTABanner
-        title="New to Dirt Racing?"
-        description="Everything you need to know for your first visit to Vado Speedway Park."
-        primaryAction={{ label: 'Start Here', href: '/plan-your-visit' }}
-        variant="dark"
-      />
-
-      {/* Sponsors */}
-      <SectionBlock variant="grey">
-        <h2
-          className="section-title-accent-center mb-8 text-center text-2xl font-bold uppercase tracking-tight text-[var(--color-text)] md:text-3xl"
-          style={{ fontFamily: 'var(--font-display)' }}
-        >
-          Our Partners
-        </h2>
-        {sponsorList.length > 0 ? (
-          <SponsorStrip sponsors={sponsorList} />
-        ) : (
-          <p className="text-center text-sm text-[var(--color-text-muted)]">
-            Sponsor information coming soon.
-          </p>
-        )}
-        <div className="mt-8 text-center">
-          <Link
-            href="/sponsors"
-            className="text-sm font-semibold uppercase tracking-wider text-[var(--color-accent)] transition-colors hover:text-red-700"
-            style={{ fontFamily: 'var(--font-display)' }}
-          >
-            Become a Sponsor
-          </Link>
+      {/* ── Email Signup / Fan Program ── */}
+      <section className="relative overflow-hidden">
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: 'url(/signup-bg.jpg)' }}
+        />
+        <div className="absolute inset-0 bg-black/60" />
+        <div className="relative z-10 mx-auto max-w-[1280px] px-6 py-20">
+          <div className="flex flex-col items-center gap-8 md:flex-row md:items-center md:justify-between">
+            <div className="text-center md:text-left">
+              <h2
+                className="text-3xl font-bold uppercase tracking-tight text-[var(--color-accent)] md:text-4xl"
+                style={{ fontFamily: 'var(--font-display)' }}
+              >
+                Don&apos;t Miss Out
+              </h2>
+              <p className="mt-2 text-sm uppercase tracking-wider text-white/80" style={{ fontFamily: 'var(--font-display)' }}>
+                Sign up for email updates here
+              </p>
+            </div>
+            <div className="w-full max-w-md">
+              <FanProgramForm />
+            </div>
+          </div>
         </div>
-      </SectionBlock>
-
-      {/* Email Signup / Fan Program */}
-      <SectionBlock variant="dark">
-        <div className="mx-auto max-w-3xl text-center">
-          <h2
-            className="mb-3 text-2xl font-bold uppercase tracking-tight text-white md:text-3xl"
-            style={{ fontFamily: 'var(--font-display)' }}
-          >
-            Stay in the Loop
-          </h2>
-          <p className="mb-6 text-sm text-white/70">
-            Sign up for exclusive updates, promotions, and early access to special event tickets.
-          </p>
-          <FanProgramForm />
-        </div>
-      </SectionBlock>
+      </section>
     </>
   );
 }

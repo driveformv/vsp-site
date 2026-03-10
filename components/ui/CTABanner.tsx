@@ -54,7 +54,7 @@ export function CTABanner({
         </h2>
 
         {description && (
-          <p className="mt-3 max-w-xl text-base opacity-80" style={{ fontFamily: 'var(--font-body)' }}>
+          <p className="mt-3 w-full max-w-xl text-base opacity-80" style={{ fontFamily: 'var(--font-body)' }}>
             {description}
           </p>
         )}

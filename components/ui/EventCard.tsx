@@ -15,111 +15,74 @@ function formatDate(dateStr: string) {
   const d = new Date(dateStr);
   const month = d.toLocaleString('en-US', { month: 'short' }).toUpperCase();
   const day = d.getDate();
-  return { month, day };
+  const year = d.getFullYear();
+  const time = d.toLocaleString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }).toLowerCase();
+  return { month, day, year, time };
 }
 
 export function EventCard({
   title,
   date,
-  classes,
   gateTime,
-  raceTime,
-  ticketLink,
-  image,
   slug,
+  image,
 }: EventCardProps) {
-  const { month, day } = formatDate(date);
+  const { month, day, year } = formatDate(date);
 
   return (
-    <article className="group overflow-hidden rounded-lg border border-[var(--color-border)] bg-white transition-shadow hover:shadow-lg">
-      <Link href={`/events/${slug}`} className="block">
-        {/* Image */}
-        <div className="relative aspect-[16/9] overflow-hidden bg-[var(--color-surface-alt)]">
-          {image ? (
-            <img
-              src={image}
-              alt={title}
-              className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-            />
-          ) : (
-            <div className="flex h-full w-full items-center justify-center">
-              <span
-                className="text-sm uppercase tracking-widest text-[var(--color-text-muted)]"
-                style={{ fontFamily: 'var(--font-display)' }}
-              >
-                VSP
-              </span>
-            </div>
-          )}
-
-          {/* Date badge */}
-          <div className="absolute left-4 top-4 flex flex-col items-center rounded bg-black/90 px-3 py-2 text-white">
-            <span className="text-xs font-semibold uppercase tracking-wider">{month}</span>
+    <Link href={`/events/${slug}`} className="group block flex-shrink-0 w-[300px] md:w-[320px]">
+      {/* Poster image */}
+      <div className="relative aspect-[3/4] overflow-hidden rounded-lg bg-[var(--color-surface-dark)]">
+        {image ? (
+          <img
+            src={image}
+            alt={title}
+            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+          />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center bg-gradient-to-b from-gray-800 to-gray-900">
             <span
-              className="text-2xl font-bold leading-none"
+              className="text-2xl font-bold uppercase tracking-widest text-white/30"
               style={{ fontFamily: 'var(--font-display)' }}
             >
-              {day}
+              VSP
             </span>
           </div>
-        </div>
-
-        {/* Content */}
-        <div className="p-5">
+        )}
+        {/* Overlay gradient */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+        {/* Title overlay */}
+        <div className="absolute bottom-0 left-0 right-0 p-4">
           <h3
-            className="text-lg font-bold uppercase leading-tight text-[var(--color-text)]"
+            className="text-lg font-bold uppercase leading-tight text-white"
             style={{ fontFamily: 'var(--font-display)' }}
           >
             {title}
           </h3>
-
-          {/* Times */}
-          {(gateTime || raceTime) && (
-            <div className="mt-3 flex gap-4 text-sm text-[var(--color-text-muted)]">
-              {gateTime && (
-                <span>
-                  Gates: <strong className="text-[var(--color-text)]">{gateTime}</strong>
-                </span>
-              )}
-              {raceTime && (
-                <span>
-                  Racing: <strong className="text-[var(--color-text)]">{raceTime}</strong>
-                </span>
-              )}
-            </div>
-          )}
-
-          {/* Class tags */}
-          {classes.length > 0 && (
-            <div className="mt-3 flex flex-wrap gap-1.5">
-              {classes.map((cls) => (
-                <span
-                  key={cls}
-                  className="rounded bg-[var(--color-surface-alt)] px-2 py-0.5 text-xs font-medium uppercase tracking-wide text-[var(--color-text-muted)]"
-                >
-                  {cls}
-                </span>
-              ))}
-            </div>
-          )}
         </div>
-      </Link>
+      </div>
 
-      {/* Ticket CTA */}
-      {ticketLink && (
-        <div className="border-t border-[var(--color-border)] px-5 py-4">
-          <a
-            href={ticketLink}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex w-full items-center justify-center rounded bg-[var(--color-accent)] px-4 py-2.5 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:bg-red-700"
-            style={{ fontFamily: 'var(--font-display)' }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            Buy Tickets
-          </a>
+      {/* Info bar below card */}
+      <div className="mt-3 flex items-center gap-4 text-xs text-[var(--color-text-muted)]">
+        <div className="flex items-center gap-1.5">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+            <line x1="16" y1="2" x2="16" y2="6" />
+            <line x1="8" y1="2" x2="8" y2="6" />
+            <line x1="3" y1="10" x2="21" y2="10" />
+          </svg>
+          <span className="font-semibold text-[var(--color-text)]">{month} {day}, {year}</span>
         </div>
-      )}
-    </article>
+        {gateTime && (
+          <div className="flex items-center gap-1.5">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <circle cx="12" cy="12" r="10" />
+              <polyline points="12 6 12 12 16 14" />
+            </svg>
+            <span className="font-semibold text-[var(--color-text)]">{gateTime}</span>
+          </div>
+        )}
+      </div>
+    </Link>
   );
 }

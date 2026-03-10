@@ -1,10 +1,5 @@
 import Link from 'next/link';
 
-interface NavLink {
-  label: string;
-  href: string;
-}
-
 interface FooterProps {
   phone?: string;
   email?: string;
@@ -15,12 +10,12 @@ interface FooterProps {
     youtube?: string;
     twitter?: string;
   };
-  navLinks?: NavLink[];
+  navLinks?: { label: string; href: string }[];
 }
 
 function FacebookIcon() {
   return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
       <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
     </svg>
   );
@@ -28,7 +23,7 @@ function FacebookIcon() {
 
 function InstagramIcon() {
   return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
       <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" />
     </svg>
   );
@@ -36,206 +31,102 @@ function InstagramIcon() {
 
 function YouTubeIcon() {
   return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
       <path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
     </svg>
   );
 }
 
-const DEFAULT_NAV: NavLink[] = [
-  { label: 'Schedule', href: '/events' },
-  { label: 'Results', href: '/results' },
-  { label: 'Points', href: '/points' },
-  { label: 'News', href: '/news' },
-];
-
-const VISIT_LINKS: NavLink[] = [
-  { label: 'Plan Your Visit', href: '/plan-your-visit' },
-  { label: 'Drivers', href: '/drivers' },
-  { label: 'Sponsors', href: '/sponsors' },
-  { label: 'About', href: '/about' },
-];
+function XIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+    </svg>
+  );
+}
 
 export default function Footer({
   phone,
-  email,
-  address,
   socialLinks,
-  navLinks,
 }: FooterProps) {
-  const quickLinks = navLinks && navLinks.length > 0
-    ? navLinks.slice(0, 4)
-    : DEFAULT_NAV;
-
   const facebookUrl = socialLinks?.facebook || 'https://facebook.com/vadospeedwaypark';
   const instagramUrl = socialLinks?.instagram || 'https://instagram.com/vadospeedwaypark';
   const youtubeUrl = socialLinks?.youtube || 'https://youtube.com/@vadospeedwaypark';
+  const twitterUrl = socialLinks?.twitter || 'https://x.com/vadospeedway';
 
   return (
-    <footer
-      style={{
-        backgroundColor: 'var(--color-surface-dark)',
-        color: '#D1D1D6',
-        fontFamily: 'var(--font-body, Inter, sans-serif)',
-      }}
-    >
-      <div className="mx-auto px-6 py-16" style={{ maxWidth: 1280 }}>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
-          {/* Column 1: Brand */}
-          <div className="flex flex-col gap-5">
+    <footer className="relative overflow-hidden">
+      {/* Background image */}
+      <div
+        className="absolute inset-0 bg-cover bg-center"
+        style={{ backgroundImage: 'url(/footer-bg.jpg)' }}
+      />
+      <div className="absolute inset-0 bg-black/80" />
+
+      <div className="relative z-10 mx-auto max-w-[1280px] px-6 py-12">
+        <div className="flex flex-col items-center gap-8 md:flex-row md:items-start md:justify-between">
+          {/* Logo */}
+          <div className="text-center md:text-left">
             <Link href="/">
               <span
-                className="text-lg font-bold tracking-wider uppercase"
-                style={{
-                  fontFamily: 'var(--font-display, Orbitron, sans-serif)',
-                  color: '#FFF',
-                  letterSpacing: '0.08em',
-                }}
+                className="text-xl font-bold uppercase tracking-wider text-white"
+                style={{ fontFamily: 'var(--font-display)' }}
               >
                 Vado Speedway Park
               </span>
             </Link>
-            <p className="text-sm leading-relaxed" style={{ color: '#86868B' }}>
-              Southern New Mexico&apos;s premier dirt track racing venue. World-class racing, every weekend.
-            </p>
-            <div className="flex items-center gap-4 mt-1">
-              <a
-                href={facebookUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="transition-opacity duration-200 hover:opacity-70"
-                style={{ color: '#86868B' }}
-                aria-label="Facebook"
-              >
-                <FacebookIcon />
-              </a>
-              <a
-                href={instagramUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="transition-opacity duration-200 hover:opacity-70"
-                style={{ color: '#86868B' }}
-                aria-label="Instagram"
-              >
-                <InstagramIcon />
-              </a>
-              <a
-                href={youtubeUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="transition-opacity duration-200 hover:opacity-70"
-                style={{ color: '#86868B' }}
-                aria-label="YouTube"
-              >
-                <YouTubeIcon />
-              </a>
-            </div>
           </div>
 
-          {/* Column 2: Quick Links */}
-          <div>
-            <h3
-              className="text-xs font-semibold uppercase tracking-widest mb-5"
-              style={{ color: '#FFF' }}
-            >
-              Quick Links
-            </h3>
-            <ul className="flex flex-col gap-3">
-              {quickLinks.map((link) => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className="text-sm transition-colors duration-200 hover:text-white"
-                    style={{ color: '#86868B' }}
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
+          {/* Contact info */}
+          <div className="flex flex-col items-center gap-1 text-sm text-white/70 md:items-start">
+            <span className="text-xs font-bold uppercase tracking-widest text-white/50">Call</span>
+            <a href={`tel:${phone || '5755247913'}`} className="font-semibold text-white transition-colors hover:text-[var(--color-accent)]">
+              {phone || '(575) 524-7913'}
+            </a>
+            <span className="mt-3 text-xs font-bold uppercase tracking-widest text-white/50">Location</span>
+            <span className="text-white/80">15900 Stern Dr, Vado, NM 88072</span>
           </div>
 
-          {/* Column 3: Visit */}
-          <div>
-            <h3
-              className="text-xs font-semibold uppercase tracking-widest mb-5"
-              style={{ color: '#FFF' }}
+          {/* Links */}
+          <div className="flex flex-col items-center gap-3 text-sm md:items-start">
+            <Link href="/sponsors" className="font-semibold uppercase tracking-wider text-white transition-colors hover:text-[var(--color-accent)]">
+              Become a Sponsor
+            </Link>
+            <a
+              href="https://maps.google.com/?q=Vado+Speedway+Park"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-semibold uppercase tracking-wider text-white transition-colors hover:text-[var(--color-accent)]"
             >
-              Visit
-            </h3>
-            <ul className="flex flex-col gap-3">
-              {VISIT_LINKS.map((link) => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className="text-sm transition-colors duration-200 hover:text-white"
-                    style={{ color: '#86868B' }}
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
+              Get Directions
+            </a>
+            <Link href="/events" className="font-semibold uppercase tracking-wider text-white transition-colors hover:text-[var(--color-accent)]">
+              Buy Tickets
+            </Link>
           </div>
 
-          {/* Column 4: Contact */}
-          <div>
-            <h3
-              className="text-xs font-semibold uppercase tracking-widest mb-5"
-              style={{ color: '#FFF' }}
-            >
-              Contact
-            </h3>
-            <ul className="flex flex-col gap-3 text-sm" style={{ color: '#86868B' }}>
-              {phone && (
-                <li>
-                  <a
-                    href={`tel:${phone}`}
-                    className="transition-colors duration-200 hover:text-white"
-                    style={{ color: '#86868B' }}
-                  >
-                    {phone}
-                  </a>
-                </li>
-              )}
-              {email && (
-                <li>
-                  <a
-                    href={`mailto:${email}`}
-                    className="transition-colors duration-200 hover:text-white"
-                    style={{ color: '#86868B' }}
-                  >
-                    {email}
-                  </a>
-                </li>
-              )}
-              <li className="leading-relaxed whitespace-pre-line">
-                {address || '22200 Stern Dr\nVado, NM 88072'}
-              </li>
-            </ul>
+          {/* Social icons */}
+          <div className="flex items-center gap-4">
+            <a href={youtubeUrl} target="_blank" rel="noopener noreferrer" className="text-white transition-opacity hover:opacity-70" aria-label="YouTube">
+              <YouTubeIcon />
+            </a>
+            <a href={facebookUrl} target="_blank" rel="noopener noreferrer" className="text-white transition-opacity hover:opacity-70" aria-label="Facebook">
+              <FacebookIcon />
+            </a>
+            <a href={twitterUrl} target="_blank" rel="noopener noreferrer" className="text-white transition-opacity hover:opacity-70" aria-label="X">
+              <XIcon />
+            </a>
+            <a href={instagramUrl} target="_blank" rel="noopener noreferrer" className="text-white transition-opacity hover:opacity-70" aria-label="Instagram">
+              <InstagramIcon />
+            </a>
           </div>
         </div>
       </div>
 
-      {/* Bottom Bar */}
-      <div
-        className="border-t"
-        style={{ borderColor: 'rgba(255,255,255,0.1)' }}
-      >
-        <div
-          className="mx-auto px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-3"
-          style={{ maxWidth: 1280 }}
-        >
-          <p className="text-xs" style={{ color: '#86868B' }}>
-            {new Date().getFullYear()} Vado Speedway Park. All rights reserved.
-          </p>
-          <Link
-            href="/sponsors"
-            className="text-xs font-medium transition-colors duration-200 hover:text-white"
-            style={{ color: '#86868B' }}
-          >
-            Become a Sponsor
-          </Link>
+      {/* Bottom bar */}
+      <div className="relative z-10 border-t border-white/10">
+        <div className="mx-auto max-w-[1280px] px-6 py-4 text-center text-xs text-white/40">
+          &copy; {new Date().getFullYear()} Vado Speedway Park. All rights reserved.
         </div>
       </div>
     </footer>

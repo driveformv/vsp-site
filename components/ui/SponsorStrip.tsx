@@ -1,5 +1,3 @@
-'use client';
-
 interface Sponsor {
   name: string;
   logo: string;

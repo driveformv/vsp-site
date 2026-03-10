@@ -46,29 +46,29 @@ export default function FanProgramForm() {
   return (
     <>
       {status === 'error' && (
-        <p className="mb-4 text-sm text-[var(--color-accent)]">
+        <p className="mb-3 text-sm text-[var(--color-accent)]">
           Something went wrong. Please try again.
         </p>
       )}
-      <form onSubmit={handleSubmit} className="flex flex-col gap-3 sm:flex-row">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-3">
         <input
           name="name"
           type="text"
           placeholder="Your name"
           required
-          className="flex-1 rounded border border-white/20 bg-white/10 px-4 py-3 text-sm text-white outline-none transition-colors placeholder:text-white/50 focus:border-white/60"
+          className="w-full rounded border border-white/30 bg-white/10 px-4 py-3 text-sm text-white outline-none backdrop-blur-sm transition-colors placeholder:text-white/50 focus:border-white/60"
         />
         <input
           name="email"
           type="email"
-          placeholder="Your email address"
+          placeholder="Your email"
           required
-          className="flex-1 rounded border border-white/20 bg-white/10 px-4 py-3 text-sm text-white outline-none transition-colors placeholder:text-white/50 focus:border-white/60"
+          className="w-full rounded border border-white/30 bg-white/10 px-4 py-3 text-sm text-white outline-none backdrop-blur-sm transition-colors placeholder:text-white/50 focus:border-white/60"
         />
         <button
           type="submit"
           disabled={status === 'loading'}
-          className="whitespace-nowrap rounded bg-[var(--color-accent)] px-6 py-3 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:bg-red-700 disabled:opacity-50"
+          className="w-full rounded border-2 border-white px-6 py-3 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:bg-white hover:text-black disabled:opacity-50"
           style={{ fontFamily: 'var(--font-display)' }}
         >
           {status === 'loading' ? 'Joining...' : 'Sign Up'}

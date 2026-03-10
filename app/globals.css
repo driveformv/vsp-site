@@ -139,6 +139,15 @@ img {
   margin-top: 12px;
 }
 
+/* Hide scrollbar for horizontal scroll containers */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
 .section-title-accent-center::after {
   content: '';
   display: block;
