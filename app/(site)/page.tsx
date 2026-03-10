@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import signupBg from '@/public/signup-bg.jpg';
+import signupBg from '../../public/signup-bg.jpg';
 import { sanityFetch } from '@/sanity/lib/fetch';
 import { upcomingEventsQuery, latestNewsQuery, sponsorsQuery, siteSettingsQuery } from '@/sanity/lib/queries';
 import { urlFor } from '@/sanity/lib/image';

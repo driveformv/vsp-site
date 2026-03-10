@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import vspLogo from '@/public/vsp-logo.jpg';
+import vspLogo from '../../public/vsp-logo.jpg';
 
 interface NavLink {
   label: string;

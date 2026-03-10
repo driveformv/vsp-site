@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import vspLogo from '@/public/vsp-logo.jpg';
-import footerBg from '@/public/footer-bg.jpg';
+import vspLogo from '../../public/vsp-logo.jpg';
+import footerBg from '../../public/footer-bg.jpg';
 
 interface FooterProps {
   phone?: string;
