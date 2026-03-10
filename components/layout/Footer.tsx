@@ -1,7 +1,5 @@
 import Link from 'next/link';
-import Image from 'next/image';
-import vspLogo from '@/assets/vsp-logo.jpg';
-import footerBg from '@/assets/footer-bg.jpg';
+import { vspLogoDataUrl } from '@/lib/logo';
 
 interface FooterProps {
   phone?: string;
@@ -60,13 +58,9 @@ export default function Footer({
   return (
     <footer className="relative overflow-hidden">
       {/* Background image */}
-      <Image
-        src={footerBg}
-        alt=""
-        fill
-        className="object-cover"
-        sizes="100vw"
-        unoptimized
+      <div
+        className="absolute inset-0 h-full w-full bg-cover bg-center"
+        style={{ backgroundImage: 'url(/footer-bg.jpg)' }}
       />
       <div className="absolute inset-0 bg-black/80" />
 
@@ -75,13 +69,12 @@ export default function Footer({
           {/* Logo */}
           <div className="text-center md:text-left">
             <Link href="/">
-              <Image
-                src={vspLogo}
+              <img
+                src={vspLogoDataUrl}
                 alt="Vado Speedway Park"
                 width={160}
                 height={160}
                 className="h-16 w-auto mx-auto md:mx-0"
-                unoptimized
               />
             </Link>
           </div>

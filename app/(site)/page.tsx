@@ -1,6 +1,4 @@
 import Link from 'next/link';
-import Image from 'next/image';
-import signupBg from '@/assets/signup-bg.jpg';
 import { sanityFetch } from '@/sanity/lib/fetch';
 import { upcomingEventsQuery, latestNewsQuery, sponsorsQuery, siteSettingsQuery } from '@/sanity/lib/queries';
 import { urlFor } from '@/sanity/lib/image';
@@ -246,13 +244,9 @@ export default async function HomePage() {
 
       {/* ── Email Signup / Fan Program ── */}
       <section className="relative overflow-hidden">
-        <Image
-          src={signupBg}
-          alt=""
-          fill
-          className="object-cover"
-          sizes="100vw"
-          unoptimized
+        <div
+          className="absolute inset-0 h-full w-full bg-cover bg-center"
+          style={{ backgroundImage: 'url(/signup-bg.jpg)' }}
         />
         <div className="absolute inset-0 bg-black/60" />
         <div className="relative z-10 mx-auto max-w-[1280px] px-6 py-20">

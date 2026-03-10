@@ -2,8 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
-import vspLogo from '@/assets/vsp-logo.jpg';
+import { vspLogoDataUrl } from '@/lib/logo';
 
 interface NavLink {
   label: string;
@@ -74,12 +73,10 @@ export default function StickyNav({
         <div className="mx-auto flex items-center justify-between px-6 py-3" style={{ maxWidth: 1280 }}>
           {/* Logo */}
           <Link href="/" className="shrink-0">
-            <Image
-              src={vspLogo}
+            <img
+              src={vspLogoDataUrl}
               alt="Vado Speedway Park"
               className="h-12 w-auto"
-              priority
-              unoptimized
             />
           </Link>
 
