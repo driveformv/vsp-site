@@ -78,9 +78,9 @@ export const newsPostsQuery = groq`
   }
 `;
 
-// News for homepage — excludes Rules, Results, Videos, Photos, Sponsors
+// News for homepage — excludes Rules, Results, Videos, Photos, Sponsors (by category and title)
 export const latestNewsQuery = groq`
-  *[_type == "newsPost" && !(category in ["Rules", "Results", "Videos", "Photos", "Sponsors"])] | order(publishDate desc) [0...5] {
+  *[_type == "newsPost" && !(lower(category) in ["rules", "results", "videos", "photos", "sponsors"]) && !(title match "Rules*") && !(title match "Results*") && !(title match "Winners*")] | order(publishDate desc) [0...5] {
     _id,
     title,
     slug,
