@@ -69,7 +69,7 @@ export default async function SiteLayout({
         ticketUrl={ticketUrl}
         streamUrl={streamUrl}
       />
-      <main className="min-h-screen pt-[72px] pb-16 md:pb-0">
+      <main className="min-h-screen pt-[88px] pb-16 md:pb-0">
         {children}
       </main>
       <Footer
