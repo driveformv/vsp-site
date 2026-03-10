@@ -95,35 +95,39 @@ export default async function HomePage() {
         videoUrl="/hero-video.mp4"
         backgroundImage="/hero-bg.jpg"
       >
-        <p
-          className="-mt-4 mb-6 text-center text-lg font-medium uppercase tracking-wide text-white/90 md:text-xl"
-          style={{ fontFamily: 'var(--font-display)' }}
-        >
-          Fuel Your{' '}
-          <span className="text-2xl font-bold italic text-white md:text-3xl">Passion</span>
-          <br />
-          <span className="text-2xl font-bold italic text-white md:text-3xl">for Speed</span>
-          <br />
-          at Vado Speedway Park
-        </p>
-        <a
-          href={ticketUrl}
-          target={ticketUrl.startsWith('http') ? '_blank' : undefined}
-          rel={ticketUrl.startsWith('http') ? 'noopener noreferrer' : undefined}
-          className="rounded bg-[var(--color-accent)] px-8 py-3 text-sm font-bold uppercase tracking-wider text-white transition-opacity hover:opacity-90"
-          style={{ fontFamily: 'var(--font-display)' }}
-        >
-          Buy Tickets
-        </a>
-        <a
-          href="https://maps.google.com/?q=Vado+Speedway+Park"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="rounded bg-green-600 px-8 py-3 text-sm font-bold uppercase tracking-wider text-white transition-opacity hover:opacity-90"
-          style={{ fontFamily: 'var(--font-display)' }}
-        >
-          Get Directions
-        </a>
+        <div className="flex flex-col items-center gap-6">
+          <p
+            className="text-center text-lg font-medium uppercase tracking-wide text-white/90 md:text-xl"
+            style={{ fontFamily: 'var(--font-display)' }}
+          >
+            Fuel Your{' '}
+            <span className="text-2xl font-bold italic text-white md:text-3xl">Passion</span>
+            <br />
+            <span className="text-2xl font-bold italic text-white md:text-3xl">for Speed</span>
+            <br />
+            at Vado Speedway Park
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-4">
+            <a
+              href={ticketUrl}
+              target={ticketUrl.startsWith('http') ? '_blank' : undefined}
+              rel={ticketUrl.startsWith('http') ? 'noopener noreferrer' : undefined}
+              className="rounded bg-[var(--color-accent)] px-8 py-3 text-sm font-bold uppercase tracking-wider text-white transition-opacity hover:opacity-90"
+              style={{ fontFamily: 'var(--font-display)' }}
+            >
+              Buy Tickets
+            </a>
+            <a
+              href="https://maps.google.com/?q=Vado+Speedway+Park"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded bg-green-600 px-8 py-3 text-sm font-bold uppercase tracking-wider text-white transition-opacity hover:opacity-90"
+              style={{ fontFamily: 'var(--font-display)' }}
+            >
+              Get Directions
+            </a>
+          </div>
+        </div>
       </PageHero>
 
       {/* ── Upcoming Events ── */}
@@ -248,6 +252,7 @@ export default async function HomePage() {
           fill
           className="object-cover"
           sizes="100vw"
+          unoptimized
         />
         <div className="absolute inset-0 bg-black/60" />
         <div className="relative z-10 mx-auto max-w-[1280px] px-6 py-20">

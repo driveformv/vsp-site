@@ -66,6 +66,7 @@ export default function Footer({
         fill
         className="object-cover"
         sizes="100vw"
+        unoptimized
       />
       <div className="absolute inset-0 bg-black/80" />
 
@@ -80,6 +81,7 @@ export default function Footer({
                 width={160}
                 height={160}
                 className="h-16 w-auto mx-auto md:mx-0"
+                unoptimized
               />
             </Link>
           </div>

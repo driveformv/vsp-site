@@ -79,6 +79,7 @@ export default function StickyNav({
               alt="Vado Speedway Park"
               className="h-12 w-auto"
               priority
+              unoptimized
             />
           </Link>
 
