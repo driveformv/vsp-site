@@ -67,7 +67,6 @@ export default function StickyNav({
         className="fixed top-0 left-0 right-0 z-[100] transition-all duration-300"
         style={{
           backgroundColor: isTransparent ? 'transparent' : 'var(--color-surface)',
-          borderBottom: isTransparent ? '1px solid transparent' : '1px solid var(--color-border)',
         }}
       >
         <div className="mx-auto flex items-center justify-between px-6 py-3" style={{ maxWidth: 1280 }}>
@@ -164,20 +163,16 @@ export default function StickyNav({
             </svg>
           </button>
         </div>
-      </nav>
 
-      {/* Red accent bar with tagline */}
-      <div
-        className="fixed left-0 right-0 z-[99] transition-all duration-300"
-        style={{
-          top: scrolled ? '56px' : '60px',
-          backgroundColor: 'var(--color-accent)',
-        }}
-      >
-        <div className="mx-auto px-6 py-1 text-center text-[10px] font-bold uppercase tracking-widest text-white" style={{ maxWidth: 1280, fontFamily: 'var(--font-body)' }}>
-          Your source for thrilling dirt track racing action near El Paso and Las Cruces
+        {/* Red accent bar with tagline */}
+        <div
+          style={{ backgroundColor: 'var(--color-accent)' }}
+        >
+          <div className="mx-auto px-6 py-1 text-center text-[10px] font-bold uppercase tracking-widest text-white" style={{ maxWidth: 1280, fontFamily: 'var(--font-body)' }}>
+            Your source for thrilling dirt track racing action near El Paso and Las Cruces
+          </div>
         </div>
-      </div>
+      </nav>
 
       {/* Mobile Menu Overlay */}
       {mobileOpen && (
