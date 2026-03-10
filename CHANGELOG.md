@@ -1,5 +1,30 @@
 # Changelog - VSP Website
 
+## 2026-03-10 (Homepage Redesign + CSS Fixes)
+
+### Homepage Redesign
+- Rewrote homepage to match mockup layout: full-viewport hero with video, events carousel, inline sponsor strip, news list, email signup with racing photo background, dark footer
+- PageHero: 85vh min-height, larger title (5xl-7xl), display font subtitle, overlay tuning
+- EventCard: poster-style 3:4 aspect ratio cards with gradient title overlay
+- NewsListItem: horizontal thumbnail + text layout with category/excerpt
+- SponsorStrip: grid layout with tier grouping, hides tier labels when all same tier
+- Footer: racing photo background with dark overlay, horizontal 4-column layout
+- FanProgramForm: vertical form with transparent inputs on dark background
+- Added hero-video.mp4, hero-bg.jpg, signup-bg.jpg, footer-bg.jpg to public/
+
+### CSS / Tailwind v4 Fixes
+- Wrapped global base styles (h1-h6, body, a, img) in `@layer base` so Tailwind utility classes properly override base heading sizes/fonts
+- Removed custom `--spacing-*` tokens from `@theme inline` that were overriding Tailwind v4's default named size scale (max-w-3xl was 64px instead of 768px, breaking layouts site-wide)
+
+### News Filtering
+- Created latestNewsQuery with `lower(category)` exclusion and title-pattern filters to keep Rules/Results/Winners posts off homepage
+- Added scrollbar-hide CSS utility for horizontal scroll containers
+
+### Media
+- Downloaded 61,417 files (8.8GB) from Kinsta via rsync
+
+---
+
 ## 2026-03-10 (Credentials, Vercel Deploy, Content Migration)
 
 ### Credentials
