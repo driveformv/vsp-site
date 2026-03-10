@@ -61,7 +61,7 @@ export default async function HomePage() {
     gateTime: e.gateTime,
     raceTime: e.raceTime,
     ticketLink: e.ticketLink,
-    image: e.image ? urlFor(e.image).width(640).height(853).url() : undefined,
+    image: e.image ? urlFor(e.image).width(640).height(480).url() : undefined,
     slug: e.slug.current,
   }));
 
@@ -90,15 +90,25 @@ export default async function HomePage() {
       {/* ── Hero ── */}
       <PageHero
         title="Vado Speedway Park"
-        subtitle="Fuel Your Passion for Speed at Vado Speedway Park"
         videoUrl="/hero-video.mp4"
         backgroundImage="/hero-bg.jpg"
       >
+        <p
+          className="-mt-4 mb-6 text-center text-lg font-medium uppercase tracking-wide text-white/90 md:text-xl"
+          style={{ fontFamily: 'var(--font-display)' }}
+        >
+          Fuel Your{' '}
+          <span className="text-2xl font-bold italic text-white md:text-3xl">Passion</span>
+          <br />
+          <span className="text-2xl font-bold italic text-white md:text-3xl">for Speed</span>
+          <br />
+          at Vado Speedway Park
+        </p>
         <a
           href={ticketUrl}
           target={ticketUrl.startsWith('http') ? '_blank' : undefined}
           rel={ticketUrl.startsWith('http') ? 'noopener noreferrer' : undefined}
-          className="rounded border-2 border-white px-8 py-3 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:bg-white hover:text-black"
+          className="rounded bg-[var(--color-accent)] px-8 py-3 text-sm font-bold uppercase tracking-wider text-white transition-opacity hover:opacity-90"
           style={{ fontFamily: 'var(--font-display)' }}
         >
           Buy Tickets
@@ -107,7 +117,7 @@ export default async function HomePage() {
           href="https://maps.google.com/?q=Vado+Speedway+Park"
           target="_blank"
           rel="noopener noreferrer"
-          className="rounded border-2 border-white px-8 py-3 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:bg-white hover:text-black"
+          className="rounded bg-green-600 px-8 py-3 text-sm font-bold uppercase tracking-wider text-white transition-opacity hover:opacity-90"
           style={{ fontFamily: 'var(--font-display)' }}
         >
           Get Directions
@@ -115,20 +125,28 @@ export default async function HomePage() {
       </PageHero>
 
       {/* ── Upcoming Events ── */}
-      <SectionBlock variant="white">
+      <SectionBlock variant="grey">
         <h2
-          className="mb-10 text-center text-3xl font-bold uppercase tracking-tight text-[var(--color-text)] md:text-4xl"
+          className="section-title-accent-center mb-10 text-center text-3xl font-bold uppercase tracking-tight text-[var(--color-text)] md:text-4xl"
           style={{ fontFamily: 'var(--font-display)' }}
         >
           Upcoming Events
         </h2>
         {upcomingEvents.length > 0 ? (
           <div className="relative">
-            <div className="flex gap-6 overflow-x-auto pb-4 scrollbar-hide md:justify-center">
+            <div className="flex gap-6 overflow-x-auto pb-4 scrollbar-hide">
               {upcomingEvents.map((event) => (
                 <EventCard key={event.slug} {...event} />
               ))}
             </div>
+            {/* Right scroll arrow */}
+            {upcomingEvents.length > 3 && (
+              <div className="pointer-events-none absolute right-0 top-0 flex h-[75%] w-16 items-center justify-end bg-gradient-to-l from-white via-white/80 to-transparent">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--color-text)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
+                  <polyline points="9 18 15 12 9 6" />
+                </svg>
+              </div>
+            )}
           </div>
         ) : (
           <p className="text-center text-sm text-[var(--color-text-muted)]">
@@ -185,7 +203,7 @@ export default async function HomePage() {
       {/* ── Latest News ── */}
       <SectionBlock variant="white">
         <h2
-          className="mb-10 text-center text-3xl font-bold uppercase tracking-tight text-[var(--color-text)] md:text-4xl"
+          className="section-title-accent-center mb-10 text-center text-3xl font-bold uppercase tracking-tight text-[var(--color-text)] md:text-4xl"
           style={{ fontFamily: 'var(--font-display)' }}
         >
           Latest News

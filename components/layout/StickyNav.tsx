@@ -72,16 +72,11 @@ export default function StickyNav({
         <div className="mx-auto flex items-center justify-between px-6 py-3" style={{ maxWidth: 1280 }}>
           {/* Logo */}
           <Link href="/" className="shrink-0">
-            <span
-              className="text-lg font-bold tracking-wider uppercase"
-              style={{
-                fontFamily: 'var(--font-display, Orbitron, sans-serif)',
-                color: isTransparent ? '#FFF' : 'var(--color-text)',
-                letterSpacing: '0.08em',
-              }}
-            >
-              Vado Speedway Park
-            </span>
+            <img
+              src="/vsp-logo.jpg"
+              alt="Vado Speedway Park"
+              className="h-12 w-auto"
+            />
           </Link>
 
           {/* Desktop Nav Links */}
@@ -169,6 +164,19 @@ export default function StickyNav({
           </button>
         </div>
       </nav>
+
+      {/* Red accent bar with tagline */}
+      <div
+        className="fixed left-0 right-0 z-[99] transition-all duration-300"
+        style={{
+          top: scrolled ? '56px' : '60px',
+          backgroundColor: 'var(--color-accent)',
+        }}
+      >
+        <div className="mx-auto px-6 py-1 text-center text-[10px] font-bold uppercase tracking-widest text-white" style={{ maxWidth: 1280, fontFamily: 'var(--font-body)' }}>
+          Your source for thrilling dirt track racing action near El Paso and Las Cruces
+        </div>
+      </div>
 
       {/* Mobile Menu Overlay */}
       {mobileOpen && (

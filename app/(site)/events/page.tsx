@@ -25,7 +25,7 @@ function mapEvent(e: SanityEvent) {
     gateTime: e.gateTime,
     raceTime: e.raceTime,
     ticketLink: e.ticketLink,
-    image: e.image ? urlFor(e.image).width(640).height(853).url() : undefined,
+    image: e.image ? urlFor(e.image).width(640).height(480).url() : undefined,
     slug: e.slug.current,
   };
 }

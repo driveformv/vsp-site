@@ -68,12 +68,11 @@ export default function Footer({
           {/* Logo */}
           <div className="text-center md:text-left">
             <Link href="/">
-              <span
-                className="text-xl font-bold uppercase tracking-wider text-white"
-                style={{ fontFamily: 'var(--font-display)' }}
-              >
-                Vado Speedway Park
-              </span>
+              <img
+                src="/vsp-logo.jpg"
+                alt="Vado Speedway Park"
+                className="h-16 w-auto mx-auto md:mx-0"
+              />
             </Link>
           </div>
 
