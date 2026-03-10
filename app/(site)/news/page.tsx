@@ -1,84 +1,34 @@
-'use client';
+import { sanityFetch } from '@/sanity/lib/fetch';
+import { newsPostsQuery } from '@/sanity/lib/queries';
+import { urlFor } from '@/sanity/lib/image';
+import { PageHero, SectionBlock, NewsCard, BreadcrumbBar } from '@/components/ui';
 
-import { useState } from 'react';
-import {
-  PageHero,
-  SectionBlock,
-  NewsCard,
-  BreadcrumbBar,
-  FilterBar,
-} from '@/components/ui';
+interface SanityNewsPost {
+  _id: string;
+  title: string;
+  slug: { current: string };
+  category?: string;
+  featuredImage?: { asset: { _ref: string } };
+  publishDate?: string;
+  excerpt?: string;
+}
 
-const featuredStory = {
-  title: '2026 Season Opener Sets New Attendance Record',
-  category: 'Announcement',
-  date: '2026-03-01',
-  excerpt:
-    'Vado Speedway Park kicked off the 2026 season with a record crowd as fans packed the grandstands for an unforgettable night of dirt track racing under the desert sky.',
-  slug: '2026-season-opener-record',
-};
+function mapPost(p: SanityNewsPost) {
+  return {
+    title: p.title,
+    category: p.category || 'News',
+    date: p.publishDate || '',
+    excerpt: p.excerpt || '',
+    image: p.featuredImage ? urlFor(p.featuredImage).width(640).height(400).url() : undefined,
+    slug: p.slug.current,
+  };
+}
 
-const articles = [
-  {
-    title: 'Modified Division Points Battle Tightens',
-    category: 'Results',
-    date: '2026-02-22',
-    excerpt:
-      'Three drivers are separated by just 15 points heading into March, setting up one of the closest championship races in recent memory.',
-    slug: 'modified-points-battle',
-  },
-  {
-    title: 'New Pit Facility Upgrades Complete',
-    category: 'Feature',
-    date: '2026-02-15',
-    excerpt:
-      'Expanded pit area with improved drainage, new concrete pads, and upgraded electrical service now available for all competitors.',
-    slug: 'pit-facility-upgrades',
-  },
-  {
-    title: 'Youth Racing Program Launches in April',
-    category: 'Announcement',
-    date: '2026-02-10',
-    excerpt:
-      'A new junior racing development program will give aspiring drivers ages 8-15 hands-on track experience with professional coaching.',
-    slug: 'youth-racing-program',
-  },
-  {
-    title: 'Stock Car Feature Recap: February 14',
-    category: 'Results',
-    date: '2026-02-14',
-    excerpt:
-      'A late-race restart shook up the field and produced a dramatic finish in the Stock Car A-Main last Saturday night.',
-    slug: 'stock-car-recap-02-14',
-  },
-  {
-    title: 'Track Prep: Behind the Scenes',
-    category: 'Feature',
-    date: '2026-02-05',
-    excerpt:
-      'How the crew transforms the racing surface before every event to deliver the best dirt track experience in the Southwest.',
-    slug: 'track-prep-behind-scenes',
-  },
-];
-
-const filters = [
-  {
-    key: 'category',
-    label: 'Category',
-    options: [
-      { value: 'announcement', label: 'Announcements' },
-      { value: 'results', label: 'Results' },
-      { value: 'feature', label: 'Features' },
-    ],
-  },
-];
-
-export default function NewsPage() {
-  const [activeFilters, setActiveFilters] = useState<Record<string, string>>({});
-
-  function handleFilterChange(key: string, value: string) {
-    setActiveFilters((prev) => ({ ...prev, [key]: value }));
-  }
+export default async function NewsPage() {
+  const posts = await sanityFetch<SanityNewsPost[]>({ query: newsPostsQuery, tags: ['newsPost'] });
+  const articles = (posts || []).map(mapPost);
+  const featured = articles[0];
+  const rest = articles.slice(1);
 
   return (
     <>
@@ -91,26 +41,20 @@ export default function NewsPage() {
         ]}
       />
 
-      <SectionBlock variant="white">
-        <FilterBar
-          filters={filters}
-          onChange={handleFilterChange}
-          activeFilters={activeFilters}
-        />
-      </SectionBlock>
-
       {/* Featured Story */}
-      <SectionBlock variant="grey">
-        <h2
-          className="mb-6 text-xs font-bold uppercase tracking-[0.2em] text-[var(--color-text-muted)]"
-          style={{ fontFamily: 'var(--font-display)' }}
-        >
-          Featured
-        </h2>
-        <div className="mx-auto max-w-2xl">
-          <NewsCard {...featuredStory} />
-        </div>
-      </SectionBlock>
+      {featured && (
+        <SectionBlock variant="grey">
+          <h2
+            className="mb-6 text-xs font-bold uppercase tracking-[0.2em] text-[var(--color-text-muted)]"
+            style={{ fontFamily: 'var(--font-display)' }}
+          >
+            Featured
+          </h2>
+          <div className="mx-auto max-w-2xl">
+            <NewsCard {...featured} />
+          </div>
+        </SectionBlock>
+      )}
 
       {/* All Articles */}
       <SectionBlock variant="white">
@@ -120,11 +64,17 @@ export default function NewsPage() {
         >
           All Stories
         </h2>
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {articles.map((article) => (
-            <NewsCard key={article.slug} {...article} />
-          ))}
-        </div>
+        {rest.length > 0 ? (
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {rest.map((article) => (
+              <NewsCard key={article.slug} {...article} />
+            ))}
+          </div>
+        ) : (
+          <p className="text-sm text-[var(--color-text-muted)]">
+            No news posts yet. Check back soon.
+          </p>
+        )}
       </SectionBlock>
     </>
   );

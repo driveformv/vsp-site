@@ -1,20 +1,29 @@
-'use client';
-
-import { FormEvent } from 'react';
+import { sanityFetch } from '@/sanity/lib/fetch';
+import { siteSettingsQuery } from '@/sanity/lib/queries';
 import {
   PageHero,
   SectionBlock,
   BreadcrumbBar,
   CTABanner,
-  FormBlock,
 } from '@/components/ui';
+import ContactForm from './ContactForm';
+import ShoutOutForm from './ShoutOutForm';
 
-function handleContactSubmit(e: FormEvent<HTMLFormElement>) {
-  e.preventDefault();
-  // Will be connected to Resend / Supabase
+interface SiteSettings {
+  phone?: string;
+  email?: string;
+  address?: string;
+  socialLinks?: {
+    facebook?: string;
+    instagram?: string;
+    youtube?: string;
+    twitter?: string;
+  };
 }
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const settings = await sanityFetch<SiteSettings | null>({ query: siteSettingsQuery, tags: ['siteSettings'] });
+
   return (
     <>
       <PageHero
@@ -121,33 +130,55 @@ export default function AboutPage() {
               >
                 Address
               </h3>
-              <p className="text-sm text-[var(--color-text-muted)]">
-                Vado Speedway Park<br />
-                Vado, NM 88072
+              <p className="whitespace-pre-line text-sm text-[var(--color-text-muted)]">
+                {settings?.address || 'Vado Speedway Park\nVado, NM 88072'}
               </p>
             </div>
-            <div>
-              <h3
-                className="mb-1 text-sm font-bold uppercase tracking-wider text-[var(--color-text)]"
-                style={{ fontFamily: 'var(--font-display)' }}
-              >
-                Email
-              </h3>
-              <p className="text-sm text-[var(--color-text-muted)]">
-                info@vadospeedwaypark.com
-              </p>
-            </div>
-            <div>
-              <h3
-                className="mb-1 text-sm font-bold uppercase tracking-wider text-[var(--color-text)]"
-                style={{ fontFamily: 'var(--font-display)' }}
-              >
-                Social
-              </h3>
-              <p className="text-sm text-[var(--color-text-muted)]">
-                Follow us on Facebook for the latest updates
-              </p>
-            </div>
+            {(settings?.phone || settings?.email) && (
+              <div>
+                <h3
+                  className="mb-1 text-sm font-bold uppercase tracking-wider text-[var(--color-text)]"
+                  style={{ fontFamily: 'var(--font-display)' }}
+                >
+                  Get in Touch
+                </h3>
+                {settings?.phone && (
+                  <p className="text-sm text-[var(--color-text-muted)]">
+                    <a href={`tel:${settings.phone}`} className="transition-colors hover:text-[var(--color-text)]">
+                      {settings.phone}
+                    </a>
+                  </p>
+                )}
+                {settings?.email && (
+                  <p className="text-sm text-[var(--color-text-muted)]">
+                    <a href={`mailto:${settings.email}`} className="transition-colors hover:text-[var(--color-text)]">
+                      {settings.email}
+                    </a>
+                  </p>
+                )}
+              </div>
+            )}
+            {settings?.socialLinks && (
+              <div>
+                <h3
+                  className="mb-1 text-sm font-bold uppercase tracking-wider text-[var(--color-text)]"
+                  style={{ fontFamily: 'var(--font-display)' }}
+                >
+                  Social
+                </h3>
+                <div className="flex gap-3 text-sm text-[var(--color-text-muted)]">
+                  {settings.socialLinks.facebook && (
+                    <a href={settings.socialLinks.facebook} target="_blank" rel="noopener noreferrer" className="transition-colors hover:text-[var(--color-text)]">Facebook</a>
+                  )}
+                  {settings.socialLinks.instagram && (
+                    <a href={settings.socialLinks.instagram} target="_blank" rel="noopener noreferrer" className="transition-colors hover:text-[var(--color-text)]">Instagram</a>
+                  )}
+                  {settings.socialLinks.youtube && (
+                    <a href={settings.socialLinks.youtube} target="_blank" rel="noopener noreferrer" className="transition-colors hover:text-[var(--color-text)]">YouTube</a>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
 
           <div>
@@ -157,21 +188,25 @@ export default function AboutPage() {
             >
               Send a Message
             </h3>
-            <FormBlock onSubmit={handleContactSubmit} submitLabel="Send Message">
-              <div>
-                <label htmlFor="name">Name</label>
-                <input id="name" name="name" type="text" placeholder="Your name" required />
-              </div>
-              <div>
-                <label htmlFor="email">Email</label>
-                <input id="email" name="email" type="email" placeholder="email@example.com" required />
-              </div>
-              <div>
-                <label htmlFor="message">Message</label>
-                <textarea id="message" name="message" rows={4} placeholder="How can we help?" />
-              </div>
-            </FormBlock>
+            <ContactForm />
           </div>
+        </div>
+      </SectionBlock>
+
+      {/* Shout Outs */}
+      <SectionBlock variant="grey">
+        <h2
+          className="mb-4 text-2xl font-bold uppercase tracking-tight text-[var(--color-text)]"
+          style={{ fontFamily: 'var(--font-display)' }}
+        >
+          Shout Outs
+        </h2>
+        <p className="mb-6 max-w-3xl text-sm leading-relaxed text-[var(--color-text-muted)]">
+          Send a shout out to a driver, crew member, or fellow fan. Your message will be
+          shared at the next event.
+        </p>
+        <div className="max-w-2xl">
+          <ShoutOutForm />
         </div>
       </SectionBlock>
 

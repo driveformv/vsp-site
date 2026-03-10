@@ -1,83 +1,27 @@
-'use client';
-
+import { sanityFetch } from '@/sanity/lib/fetch';
+import { raceClassesQuery } from '@/sanity/lib/queries';
 import {
   PageHero,
   SectionBlock,
   BreadcrumbBar,
-  AccordionGroup,
   CTABanner,
 } from '@/components/ui';
+import DriversRulesAccordion from './DriversRulesAccordion';
+import DriverRegistrationForm from './DriverRegistrationForm';
+import EntryForm from './EntryForm';
 
-const rulesByClass = [
-  {
-    title: 'USRA Modifieds',
-    content: (
-      <div className="space-y-2 text-sm">
-        <p>Full USRA Modified rules apply. All competitors must hold a valid USRA license.</p>
-        <p>Refer to the official USRA rulebook for complete specifications on engine, chassis, tires, and safety equipment.</p>
-      </div>
-    ),
-  },
-  {
-    title: 'USRA Stock Cars',
-    content: (
-      <div className="space-y-2 text-sm">
-        <p>Full USRA Stock Car rules apply. Competitors must hold a valid USRA license.</p>
-        <p>See the official USRA rulebook for complete technical specifications.</p>
-      </div>
-    ),
-  },
-  {
-    title: 'USRA Hobby Stocks',
-    content: (
-      <div className="space-y-2 text-sm">
-        <p>Full USRA Hobby Stock rules apply. Competitors must hold a valid USRA license.</p>
-        <p>See the official USRA rulebook for complete technical specifications.</p>
-      </div>
-    ),
-  },
-  {
-    title: 'Sport Mods',
-    content: (
-      <div className="space-y-2 text-sm">
-        <p>Sport Mod rules follow VSP-specific guidelines. Contact the competition director for the latest rulebook.</p>
-      </div>
-    ),
-  },
-  {
-    title: 'Mini Stocks',
-    content: (
-      <div className="space-y-2 text-sm">
-        <p>Mini Stock rules follow VSP-specific guidelines. Contact the competition director for details.</p>
-      </div>
-    ),
-  },
-];
+interface RaceClass {
+  _id: string;
+  className: string;
+  sponsorName?: string;
+  division?: string;
+  rulesPdf?: { asset: { url: string } };
+}
 
-const classes = [
-  {
-    name: 'USRA Modifieds',
-    description: 'Open wheel, purpose-built race cars. The premier division at Vado Speedway Park.',
-  },
-  {
-    name: 'USRA Stock Cars',
-    description: 'Full-bodied stock cars with spec engine packages. Competitive and affordable racing.',
-  },
-  {
-    name: 'USRA Hobby Stocks',
-    description: 'Entry-level full-body division. A great starting point for new competitors.',
-  },
-  {
-    name: 'Sport Mods',
-    description: 'Modified-style open wheel cars with cost-control measures for competitive fields.',
-  },
-  {
-    name: 'Mini Stocks',
-    description: 'Four-cylinder economy class. Lowest cost of entry for grassroots dirt track racing.',
-  },
-];
+export default async function DriversPage() {
+  const raceClasses = await sanityFetch<RaceClass[]>({ query: raceClassesQuery, tags: ['raceClass'] });
+  const classes = raceClasses || [];
 
-export default function DriversPage() {
   return (
     <>
       <PageHero
@@ -100,24 +44,52 @@ export default function DriversPage() {
         >
           Classes &amp; Divisions
         </h2>
-        <div className="grid max-w-4xl gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {classes.map((cls) => (
-            <div
-              key={cls.name}
-              className="rounded-lg border border-[var(--color-border)] p-5"
-            >
-              <h3
-                className="mb-2 text-sm font-bold uppercase tracking-wider text-[var(--color-text)]"
-                style={{ fontFamily: 'var(--font-display)' }}
+        {classes.length > 0 ? (
+          <div className="grid max-w-4xl gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {classes.map((cls) => (
+              <div
+                key={cls._id}
+                className="rounded-lg border border-[var(--color-border)] p-5"
               >
-                {cls.name}
-              </h3>
-              <p className="text-sm leading-relaxed text-[var(--color-text-muted)]">
-                {cls.description}
-              </p>
-            </div>
-          ))}
-        </div>
+                <h3
+                  className="mb-2 text-sm font-bold uppercase tracking-wider text-[var(--color-text)]"
+                  style={{ fontFamily: 'var(--font-display)' }}
+                >
+                  {cls.sponsorName ? `${cls.sponsorName} ${cls.className}` : cls.className}
+                </h3>
+                {cls.division && (
+                  <p className="text-sm leading-relaxed text-[var(--color-text-muted)]">
+                    Division: {cls.division}
+                  </p>
+                )}
+                {cls.rulesPdf?.asset?.url && (
+                  <a
+                    href={cls.rulesPdf.asset.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-3 inline-block text-xs font-semibold uppercase tracking-wider text-[var(--color-accent)] transition-colors hover:text-red-700"
+                    style={{ fontFamily: 'var(--font-display)' }}
+                  >
+                    Download Rules PDF
+                  </a>
+                )}
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="grid max-w-4xl gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {['USRA Modifieds', 'USRA Stock Cars', 'USRA Hobby Stocks', 'Sport Mods', 'Mini Stocks'].map((name) => (
+              <div key={name} className="rounded-lg border border-[var(--color-border)] p-5">
+                <h3
+                  className="mb-2 text-sm font-bold uppercase tracking-wider text-[var(--color-text)]"
+                  style={{ fontFamily: 'var(--font-display)' }}
+                >
+                  {name}
+                </h3>
+              </div>
+            ))}
+          </div>
+        )}
       </SectionBlock>
 
       {/* Rules */}
@@ -129,7 +101,7 @@ export default function DriversPage() {
           Rules by Class
         </h2>
         <div className="max-w-3xl">
-          <AccordionGroup items={rulesByClass} />
+          <DriversRulesAccordion classes={classes} />
         </div>
       </SectionBlock>
 
@@ -139,40 +111,35 @@ export default function DriversPage() {
           className="mb-4 text-2xl font-bold uppercase tracking-tight text-[var(--color-text)]"
           style={{ fontFamily: 'var(--font-display)' }}
         >
-          Registration
+          Driver Registration
         </h2>
-        <div className="max-w-3xl space-y-4">
-          <p className="text-sm text-[var(--color-text-muted)]">
-            All drivers must complete registration before their first event.
-            Registration is handled at the pit gate on race day or can be completed
-            in advance by contacting the track office.
-          </p>
-          <div className="rounded-lg border border-[var(--color-border)] p-5">
-            <h3
-              className="mb-2 text-sm font-bold uppercase tracking-wider text-[var(--color-text)]"
-              style={{ fontFamily: 'var(--font-display)' }}
-            >
-              Requirements
-            </h3>
-            <ul className="space-y-2 text-sm text-[var(--color-text-muted)]">
-              <li className="flex items-start gap-2">
+        <p className="mb-6 max-w-3xl text-sm text-[var(--color-text-muted)]">
+          All drivers must complete registration before their first event. Submit online below
+          or register at the pit gate on race day.
+        </p>
+        <div className="mb-6 rounded-lg border border-[var(--color-border)] p-5">
+          <h3
+            className="mb-2 text-sm font-bold uppercase tracking-wider text-[var(--color-text)]"
+            style={{ fontFamily: 'var(--font-display)' }}
+          >
+            Requirements
+          </h3>
+          <ul className="space-y-2 text-sm text-[var(--color-text-muted)]">
+            {[
+              'Valid driver\'s license',
+              'Signed liability waiver',
+              'USRA license (for USRA-sanctioned divisions)',
+              'Approved safety equipment (helmet, suit, gloves, HANS device)',
+            ].map((item) => (
+              <li key={item} className="flex items-start gap-2">
                 <span className="mt-0.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--color-accent)]" />
-                Valid driver&apos;s license
+                {item}
               </li>
-              <li className="flex items-start gap-2">
-                <span className="mt-0.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--color-accent)]" />
-                Signed liability waiver
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="mt-0.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--color-accent)]" />
-                USRA license (for USRA-sanctioned divisions)
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="mt-0.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--color-accent)]" />
-                Approved safety equipment (helmet, suit, gloves, HANS device)
-              </li>
-            </ul>
-          </div>
+            ))}
+          </ul>
+        </div>
+        <div className="max-w-2xl">
+          <DriverRegistrationForm />
         </div>
       </SectionBlock>
 
@@ -182,25 +149,14 @@ export default function DriversPage() {
           className="mb-4 text-2xl font-bold uppercase tracking-tight text-[var(--color-text)]"
           style={{ fontFamily: 'var(--font-display)' }}
         >
-          Entry Forms
+          Event Entry Form
         </h2>
         <p className="mb-6 max-w-3xl text-sm text-[var(--color-text-muted)]">
-          Download and complete the appropriate entry form before arriving at the track.
-          Forms can be submitted at the pit gate on race day.
+          Submit your entry for an upcoming event. Entry forms can also be completed
+          at the pit gate on race day.
         </p>
-        <div className="flex flex-wrap gap-3">
-          {['Weekly Entry Form', 'Special Event Entry Form', 'Minor Waiver'].map(
-            (form) => (
-              <a
-                key={form}
-                href="#"
-                className="rounded border border-[var(--color-border)] bg-white px-4 py-2.5 text-xs font-semibold uppercase tracking-wider text-[var(--color-text)] transition-colors hover:border-[var(--color-text)]"
-                style={{ fontFamily: 'var(--font-display)' }}
-              >
-                {form}
-              </a>
-            )
-          )}
+        <div className="max-w-2xl">
+          <EntryForm />
         </div>
       </SectionBlock>
 

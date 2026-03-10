@@ -31,24 +31,28 @@ Vado Speedway Park website rebuild. Migration from WordPress/Divi (Kinsta) to mo
 ## Project Structure
 ```
 app/
-  (site)/           -- Public pages with StickyNav + Footer + MobileBottomBar
-    page.tsx        -- Homepage
-    events/         -- Schedule & event detail
-    news/           -- News & articles
-    plan-your-visit/-- First-timer guide
-    drivers/        -- Rules, registration, entry forms
-    sponsors/       -- Partner display + lead gen
-    about/          -- Track info, history, contact
-  points/           -- Points standings (ported from existing app)
-  results/          -- Race results (ported from existing app)
+  (site)/           -- Public pages (server components) with StickyNav + Footer + MobileBottomBar
+    page.tsx        -- Homepage (fetches events, news, sponsors from Sanity)
+    events/         -- Schedule & event detail (Sanity data)
+    news/           -- News & articles (Sanity data)
+    plan-your-visit/-- First-timer guide (Sanity singleton)
+    drivers/        -- Rules, registration (Sanity race classes)
+    sponsors/       -- Partner display + lead gen (Sanity sponsors)
+    about/          -- Track info, contact (Sanity site settings)
+  points/           -- Points standings (ported from existing app, MUI)
+  results/          -- Race results (ported from existing app, MUI)
   studio/           -- Embedded Sanity Studio at /studio
-  api/              -- API routes (sync, forms)
+  api/              -- API routes (sync, validate-event, forms)
+  sitemap.ts        -- Dynamic sitemap (static + Sanity slugs)
+  robots.ts         -- robots.txt
 components/
   ui/               -- Shared UI components (PageHero, EventCard, NewsCard, etc.)
   layout/           -- Layout components (StickyNav, Footer, MobileBottomBar)
+  seo/              -- JSON-LD structured data components
 sanity/
-  schemas/          -- Sanity content type definitions
-  lib/              -- Sanity client config
+  schemas/          -- Sanity content type definitions (8 types)
+  lib/              -- Sanity client, queries, fetch helper, image builder
+  actions/          -- Sanity document actions (ValidateEventAction)
 lib/                -- Supabase client, utilities
 types/              -- TypeScript interfaces
 ```
@@ -75,6 +79,18 @@ types/              -- TypeScript interfaces
 
 ## Sanity Schemas
 - event, newsPost, sponsor, raceClass, page, navigation, firstTimerGuide (singleton), siteSettings (singleton)
+
+## Sanity Data Flow
+- All page data fetched via `sanityFetch()` from `sanity/lib/fetch.ts`
+- GROQ queries defined in `sanity/lib/queries.ts`
+- ISR: 60s for page data, 300s for layout data (nav, settings)
+- Images via `urlFor()` from `sanity/lib/image.ts`
+- Rich text rendered with @portabletext/react
+
+## API Routes
+- `/api/data` - GET with type=points|results (Supabase)
+- `/api/sync-all` - MyRacePass -> Supabase cron sync (GET/POST)
+- `/api/validate-event` - AI event validation (Anthropic SDK)
 
 ## Rules
 - No emoji anywhere in the frontend

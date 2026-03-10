@@ -2,7 +2,11 @@
 
 import Link from 'next/link';
 
-export default function MobileBottomBar() {
+interface MobileBottomBarProps {
+  ticketUrl?: string;
+}
+
+export default function MobileBottomBar({ ticketUrl = '/events' }: MobileBottomBarProps) {
   return (
     <div
       className="fixed bottom-0 left-0 right-0 z-[90] md:hidden"
@@ -14,8 +18,10 @@ export default function MobileBottomBar() {
     >
       <div className="flex items-stretch">
         {/* Tickets - Primary CTA */}
-        <Link
-          href="/tickets"
+        <a
+          href={ticketUrl}
+          target={ticketUrl.startsWith('http') ? '_blank' : undefined}
+          rel={ticketUrl.startsWith('http') ? 'noopener noreferrer' : undefined}
           className="flex-1 flex flex-col items-center justify-center gap-1 py-3 transition-opacity duration-200 hover:opacity-90"
           style={{
             backgroundColor: 'var(--color-accent)',
@@ -39,11 +45,11 @@ export default function MobileBottomBar() {
             <path d="M13 11v2" />
           </svg>
           <span className="text-xs font-semibold uppercase tracking-wide">Tickets</span>
-        </Link>
+        </a>
 
         {/* Schedule */}
         <Link
-          href="/schedule"
+          href="/events"
           className="flex-1 flex flex-col items-center justify-center gap-1 py-3 transition-opacity duration-200 hover:opacity-80"
           style={{
             backgroundColor: 'var(--color-surface)',

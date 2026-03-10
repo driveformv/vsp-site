@@ -1,95 +1,43 @@
-'use client';
+import { sanityFetch } from '@/sanity/lib/fetch';
+import { upcomingEventsQuery, pastEventsQuery } from '@/sanity/lib/queries';
+import { urlFor } from '@/sanity/lib/image';
+import { PageHero, SectionBlock, EventCard, BreadcrumbBar } from '@/components/ui';
 
-import { useState } from 'react';
-import {
-  PageHero,
-  SectionBlock,
-  EventCard,
-  BreadcrumbBar,
-  FilterBar,
-} from '@/components/ui';
+interface SanityEvent {
+  _id: string;
+  title: string;
+  slug: { current: string };
+  date: string;
+  gateTime?: string;
+  raceTime?: string;
+  raceClasses?: { sponsorName?: string; className: string }[];
+  image?: { asset: { _ref: string } };
+  ticketLink?: string;
+  eventType?: string;
+  weatherStatus?: string;
+}
 
-const upcomingEvents = [
-  {
-    title: 'Saturday Night Thunder',
-    date: '2026-03-14',
-    classes: ['Modifieds', 'Stock Cars', 'Hobby Stocks'],
-    gateTime: '5:00 PM',
-    raceTime: '7:00 PM',
-    ticketLink: '#',
-    slug: 'saturday-night-thunder-03-14',
-  },
-  {
-    title: 'Sprint Car Showdown',
-    date: '2026-03-21',
-    classes: ['Sprint Cars', 'Modifieds', 'Sport Mods'],
-    gateTime: '4:30 PM',
-    raceTime: '6:30 PM',
-    ticketLink: '#',
-    slug: 'sprint-car-showdown-03-21',
-  },
-  {
-    title: 'Easter Classic',
-    date: '2026-04-04',
-    classes: ['Modifieds', 'Stock Cars', 'Hobby Stocks', 'Mini Stocks'],
-    gateTime: '4:00 PM',
-    raceTime: '6:00 PM',
-    ticketLink: '#',
-    slug: 'easter-classic-04-04',
-  },
-  {
-    title: 'Memorial Day Special',
-    date: '2026-05-25',
-    classes: ['Modifieds', 'Stock Cars', 'Sport Mods'],
-    gateTime: '4:00 PM',
-    raceTime: '6:00 PM',
-    ticketLink: '#',
-    slug: 'memorial-day-special-05-25',
-  },
-];
+function mapEvent(e: SanityEvent) {
+  return {
+    title: e.title,
+    date: e.date,
+    classes: (e.raceClasses || []).map((c) => c.className),
+    gateTime: e.gateTime,
+    raceTime: e.raceTime,
+    ticketLink: e.ticketLink,
+    image: e.image ? urlFor(e.image).width(640).height(360).url() : undefined,
+    slug: e.slug.current,
+  };
+}
 
-const pastEvents = [
-  {
-    title: '2026 Season Opener',
-    date: '2026-02-28',
-    classes: ['Modifieds', 'Stock Cars', 'Hobby Stocks'],
-    slug: 'season-opener-02-28',
-  },
-  {
-    title: 'Winter Warmup',
-    date: '2026-02-14',
-    classes: ['Modifieds', 'Sport Mods'],
-    slug: 'winter-warmup-02-14',
-  },
-];
+export default async function EventsPage() {
+  const [upcoming, past] = await Promise.all([
+    sanityFetch<SanityEvent[]>({ query: upcomingEventsQuery, tags: ['event'] }),
+    sanityFetch<SanityEvent[]>({ query: pastEventsQuery, tags: ['event'] }),
+  ]);
 
-const filters = [
-  {
-    key: 'year',
-    label: 'Year',
-    options: [
-      { value: '2026', label: '2026' },
-      { value: '2025', label: '2025' },
-      { value: '2024', label: '2024' },
-    ],
-  },
-  {
-    key: 'type',
-    label: 'Event Type',
-    options: [
-      { value: 'weekly', label: 'Weekly Racing' },
-      { value: 'special', label: 'Special Events' },
-      { value: 'series', label: 'Touring Series' },
-    ],
-  },
-];
-
-export default function EventsPage() {
-  const [activeFilters, setActiveFilters] = useState<Record<string, string>>({});
-
-  function handleFilterChange(key: string, value: string) {
-    setActiveFilters((prev) => ({ ...prev, [key]: value }));
-  }
+  const upcomingEvents = (upcoming || []).map(mapEvent);
+  const pastEvents = (past || []).slice(0, 12).map(mapEvent);
 
   return (
     <>
@@ -102,14 +50,6 @@ export default function EventsPage() {
         ]}
       />
 
-      <SectionBlock variant="white">
-        <FilterBar
-          filters={filters}
-          onChange={handleFilterChange}
-          activeFilters={activeFilters}
-        />
-      </SectionBlock>
-
       {/* Upcoming Events */}
       <SectionBlock variant="grey">
         <h2
@@ -118,11 +58,17 @@ export default function EventsPage() {
         >
           Upcoming Events
         </h2>
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {upcomingEvents.map((event) => (
-            <EventCard key={event.slug} {...event} />
-          ))}
-        </div>
+        {upcomingEvents.length > 0 ? (
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {upcomingEvents.map((event) => (
+              <EventCard key={event.slug} {...event} />
+            ))}
+          </div>
+        ) : (
+          <p className="text-sm text-[var(--color-text-muted)]">
+            No upcoming events scheduled. Check back soon.
+          </p>
+        )}
       </SectionBlock>
 
       {/* Past Events */}
@@ -133,11 +79,17 @@ export default function EventsPage() {
         >
           Past Events
         </h2>
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {pastEvents.map((event) => (
-            <EventCard key={event.slug} {...event} />
-          ))}
-        </div>
+        {pastEvents.length > 0 ? (
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {pastEvents.map((event) => (
+              <EventCard key={event.slug} {...event} />
+            ))}
+          </div>
+        ) : (
+          <p className="text-sm text-[var(--color-text-muted)]">
+            No past events to show.
+          </p>
+        )}
       </SectionBlock>
     </>
   );

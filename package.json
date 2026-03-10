@@ -17,6 +17,7 @@
     "@fontsource/orbitron": "^5.2.8",
     "@mui/icons-material": "^7.3.9",
     "@mui/material": "^7.3.9",
+    "@portabletext/react": "^6.0.3",
     "@sanity/icons": "^3.7.4",
     "@sanity/image-url": "^2.0.3",
     "@sanity/vision": "^5.13.0",
@@ -25,6 +26,7 @@
     "next-sanity": "^12.1.1",
     "react": "19.2.3",
     "react-dom": "19.2.3",
+    "resend": "^6.9.3",
     "sanity": "^5.13.0"
   },
   "devDependencies": {

@@ -4,6 +4,51 @@ Status: [ ] = todo, [x] = done, [~] = in progress
 
 ---
 
+## PENDING - Needs Hector's Action
+
+These items are blocked. Everything else that can be done without credentials IS done.
+
+### Credentials Needed (add to .env.local + Vercel dashboard)
+1. **SSH key for Kinsta** - No key configured for `vadospeedwaypark@34.174.186.154:24029`. Need to add SSH key or provide password. Blocks: media download (T6.1b) and WordPress data export (T7.1c, T7.3b)
+2. **Sanity write token** - Create at https://www.sanity.io/manage/project/jsftjck0/api#tokens (needs "Editor" role). Add as `SANITY_TOKEN` in .env.local. Blocks: all content imports (T7.2, T7.4, T7.6-T7.10)
+3. **Resend API key** - Sign up at https://resend.com, create API key. Add as `RESEND_API_KEY` in .env.local + Vercel. Also set `ADMIN_EMAIL` (where form notifications go). Blocks: email confirmations (T5.13)
+4. **Anthropic API key** - From https://console.anthropic.com. Add as `ANTHROPIC_API_KEY`. Blocks: AI event validation (T3.6)
+5. **MyRacePass API key** - Get from MyRacePass account. Add as `MYRACEPASS_API_KEY`. Blocks: results/points sync (T2.9-T2.13)
+
+### Dashboard Tasks (manual, no code needed)
+6. **Set Vercel env vars** (T2.9) - Push all keys from .env.local to Vercel: `vercel env add` or dashboard at https://vercel.com/mvt-marketing/vsp-site/settings/environment-variables
+7. **Sanity webhook** (T4.21) - In Sanity dashboard, create webhook pointing to Vercel deploy hook URL. Triggers rebuild on content publish.
+8. **Sanity Studio CORS** - Add production domain to CORS origins at https://www.sanity.io/manage/project/jsftjck0/api
+
+### After Credentials Are Set - Run These Commands
+```bash
+# 1. Download WordPress media (9.3 GB) - needs SSH key
+./scripts/download-media.sh --dry-run   # preview first
+./scripts/download-media.sh             # actual download
+
+# 2. Export WordPress data as JSON - needs SSH key
+./scripts/export-wordpress.sh --all     # creates data/wp-events.json, wp-posts.json, wp-sponsors.json
+
+# 3. Import into Sanity - needs SANITY_TOKEN
+SANITY_TOKEN=sk-... npx tsx scripts/import-events.ts data/wp-events.json
+SANITY_TOKEN=sk-... npx tsx scripts/import-news.ts data/wp-posts.json
+SANITY_TOKEN=sk-... npx tsx scripts/import-sponsors.ts data/wp-sponsors.json
+
+# 4. Upload media - needs SANITY_TOKEN
+SANITY_TOKEN=sk-... npx tsx scripts/upload-to-sanity.ts --dry-run
+SANITY_TOKEN=sk-... npx tsx scripts/upload-to-sanity.ts
+
+# 5. Verify everything
+npm run build   # should be zero errors
+```
+
+### DNS Cutover (do last, after QA)
+- Point vadospeedwaypark.com A record to 76.76.21.21
+- Point www CNAME to cname.vercel-dns.com
+- Keep Kinsta live 2 weeks as fallback
+
+---
+
 ## Phase 1: Foundation [DONE]
 
 - [x] T1.1 - Initialize Next.js 16 with App Router, TypeScript, Tailwind v4
@@ -110,7 +155,7 @@ Status: [ ] = todo, [x] = done, [~] = in progress
 ## Phase 4: Connect Sanity to Pages
 
 ### Sanity Queries (GROQ)
-- [ ] T4.1 - Create `sanity/lib/queries.ts` with all GROQ queries
+- [x] T4.1 - Create `sanity/lib/queries.ts` with all GROQ queries
   - getUpcomingEvents, getPastEvents, getEventBySlug
   - getNewsPosts, getNewsPostBySlug
   - getSponsors (by tier)
@@ -118,57 +163,65 @@ Status: [ ] = todo, [x] = done, [~] = in progress
   - getFirstTimerGuide
   - getNavigationItems
   - getRaceClasses
-- [ ] T4.2 - Create `sanity/lib/fetch.ts` helper (sanityFetch with caching/ISR)
+- [x] T4.2 - Create `sanity/lib/fetch.ts` helper (sanityFetch with caching/ISR)
 
 ### Wire up pages
-- [ ] T4.3 - Homepage: fetch upcoming events, latest news, sponsors from Sanity
-- [ ] T4.4 - Events listing: fetch all events, support filtering
-- [ ] T4.5 - Event detail [slug]: fetch single event, generate static params
-- [ ] T4.6 - News listing: fetch posts with category filter
-- [ ] T4.7 - News detail [slug]: fetch single post, generate static params
-- [ ] T4.8 - Sponsors page: fetch sponsors grouped by tier
-- [ ] T4.9 - Plan Your Visit: fetch firstTimerGuide singleton
-- [ ] T4.10 - Drivers page: fetch raceClasses, rules PDFs
-- [ ] T4.11 - About page: fetch siteSettings for contact info
-- [ ] T4.12 - StickyNav: fetch navigation items from Sanity
-- [ ] T4.13 - Footer: fetch siteSettings for contact/social
+- [x] T4.3 - Homepage: fetch upcoming events, latest news, sponsors from Sanity
+- [x] T4.4 - Events listing: fetch all events, support filtering
+- [x] T4.5 - Event detail [slug]: fetch single event, generate static params
+- [x] T4.6 - News listing: fetch posts with category filter
+- [x] T4.7 - News detail [slug]: fetch single post, generate static params
+- [x] T4.8 - Sponsors page: fetch sponsors grouped by tier
+- [x] T4.9 - Plan Your Visit: fetch firstTimerGuide singleton
+- [x] T4.10 - Drivers page: fetch raceClasses, rules PDFs
+- [x] T4.11 - About page: fetch siteSettings for contact info
+- [x] T4.12 - StickyNav: fetch navigation items from Sanity
+- [x] T4.13 - Footer: fetch siteSettings for contact/social
 
 ### SEO / Structured Data
-- [ ] T4.14 - Add SportsEvent JSON-LD to event detail pages
-- [ ] T4.15 - Add LocalBusiness + Organization JSON-LD to homepage
-- [ ] T4.16 - Add BreadcrumbList JSON-LD to all subpages
-- [ ] T4.17 - Add Article JSON-LD to news posts
-- [ ] T4.18 - Generate sitemap.xml (app/sitemap.ts)
-- [ ] T4.19 - Generate robots.txt (app/robots.ts)
-- [ ] T4.20 - Add OpenGraph and Twitter meta to all pages
+- [x] T4.14 - Add SportsEvent JSON-LD to event detail pages
+- [x] T4.15 - Add LocalBusiness + Organization JSON-LD to homepage
+- [x] T4.16 - Add BreadcrumbList JSON-LD to all subpages
+- [x] T4.17 - Add Article JSON-LD to news posts
+- [x] T4.18 - Generate sitemap.xml (app/sitemap.ts)
+- [x] T4.19 - Generate robots.txt (app/robots.ts)
+- [x] T4.20 - Add OpenGraph and Twitter meta to all pages
 
 ### Revalidation
 - [ ] T4.21 - Set up Sanity webhook to hit Vercel deploy hook
-- [ ] T4.22 - Configure ISR revalidation (60s for listings, on-demand for detail pages)
+- [x] T4.22 - Configure ISR revalidation (60s for listings, on-demand for detail pages)
 
 ---
 
 ## Phase 5: Forms & API Routes
 
-- [ ] T5.1 - Create `/api/contact/route.ts` (Contact form -> Supabase + Resend)
-- [ ] T5.2 - Create `/api/sponsor-inquiry/route.ts` (Sponsor form -> Supabase + Resend)
-- [ ] T5.3 - Create `/api/shout-out/route.ts` (Shout Out Request form)
-- [ ] T5.4 - Create `/api/driver-registration/route.ts` (Driver form - NO SSN/CC fields)
-- [ ] T5.5 - Create `/api/entry-form/route.ts` (Entry form - NO payment fields)
-- [ ] T5.6 - Create `/api/fan-program/route.ts` (Fan Program form)
-- [ ] T5.7 - Install and configure Resend for email confirmations
-- [ ] T5.8 - Create Supabase tables for form submissions (contact_submissions, sponsor_inquiries, etc.)
-- [ ] T5.9 - Build form UIs on respective pages using FormBlock component
-- [ ] T5.10 - Test: each form submits, data appears in Supabase, confirmation email sends
+- [x] T5.1 - Create `/api/contact/route.ts` (Contact form -> Supabase + Resend)
+- [x] T5.2 - Create `/api/sponsor-inquiry/route.ts` (Sponsor form -> Supabase + Resend)
+- [x] T5.3 - Create `/api/shout-out/route.ts` (Shout Out Request form)
+- [x] T5.4 - Create `/api/driver-registration/route.ts` (Driver form - NO SSN/CC fields)
+- [x] T5.5 - Create `/api/entry-form/route.ts` (Entry form - NO payment fields)
+- [x] T5.6 - Create `/api/fan-program/route.ts` (Fan Program form)
+- [x] T5.7 - Install and configure Resend for email confirmations
+- [x] T5.8 - Create Supabase migration for form tables (supabase/migrations/001_form_tables.sql)
+- [x] T5.9 - Build form UIs on respective pages using FormBlock component
+  - ContactForm on /about
+  - SponsorInquiryForm on /sponsors
+  - ShoutOutForm on /about
+  - DriverRegistrationForm on /drivers
+  - EntryForm on /drivers
+  - FanProgramForm on homepage
+- [x] T5.10 - Run SQL migration via Supabase CLI (all 6 tables live, verified 200)
+- [x] T5.11 - Created .env.local with Supabase keys (Resend/Anthropic/Sanity tokens still needed)
+- [x] T5.12 - Tested all 6 forms end-to-end: API returns success, data confirmed in Supabase
+- [ ] T5.13 - Set RESEND_API_KEY and ADMIN_EMAIL in Vercel env vars (email sending requires Resend account)
 
 ---
 
 ## Phase 6: Media Migration
 
-- [ ] T6.1 - Download all media from Kinsta via SSH/rsync (9.3 GB)
-  - SSH: vadospeedwaypark@34.174.186.154:24029
-  - WP path: /www/vadospeedwaypark_162/public/wp-content/uploads/
-- [ ] T6.2 - Write Sanity asset upload script (content images: event covers, news, logos)
+- [x] T6.1 - Write download-media.sh script (rsync over SSH, port 24029, dry-run support)
+- [ ] T6.1b - Run download-media.sh to pull 9.3 GB from Kinsta
+- [x] T6.2 - Write upload-to-sanity.ts script (categorize + upload to Sanity CDN / Supabase Storage)
 - [ ] T6.3 - Run upload script to push images to Sanity CDN
 - [ ] T6.4 - Upload bulk race photos to Supabase Storage (race-photos/{year}/{event-slug}/)
 - [ ] T6.5 - Copy static assets (logo, favicon) to /public/
@@ -179,15 +232,14 @@ Status: [ ] = todo, [x] = done, [~] = in progress
 
 ## Phase 7: Content Migration
 
-- [ ] T7.1 - Write event import script (parse WordPress MEC meta -> Sanity)
-  - Source: wp-content-inventory/events-meta-sample.txt
-  - Map: dates, times, classes, images, event types
-- [ ] T7.2 - Run event import into Sanity
-- [ ] T7.3 - Write news post import script (strip Divi shortcodes -> clean Portable Text)
-  - Source: wp-content-inventory/all-pages-content.txt
-  - 392 Videos, 112 Photos, 105 News, 105 Results posts
-- [ ] T7.4 - Run news post import into Sanity
-- [ ] T7.5 - Import 46+ sponsors with logos and tiers into Sanity
+- [x] T7.1 - Write event import script (scripts/import-events.ts)
+- [x] T7.1b - Write WordPress export script (scripts/export-wordpress.sh)
+- [ ] T7.1c - Run export-wordpress.sh --events to get events.json
+- [ ] T7.2 - Run import-events.ts to push events to Sanity
+- [x] T7.3 - Write news post import script (scripts/import-news.ts, strips Divi shortcodes)
+- [ ] T7.3b - Run export-wordpress.sh --posts to get posts.json
+- [ ] T7.4 - Run import-news.ts to push news posts to Sanity
+- [x] T7.5 - Write sponsor import script (scripts/import-sponsors.ts)
 - [ ] T7.6 - Migrate About, FAQ, Rules, Suites page content into Sanity
 - [ ] T7.7 - Create race class entries in Sanity (with sponsor names, rules PDFs)
 - [ ] T7.8 - Set up navigation items in Sanity
@@ -201,7 +253,7 @@ Status: [ ] = todo, [x] = done, [~] = in progress
 ## Phase 8: Domain Cutover
 
 - [ ] T8.1 - Final QA on Vercel preview URL
-- [ ] T8.2 - Set up 301 redirects in vercel.json for old WordPress URLs
+- [x] T8.2 - Set up 301 redirects in vercel.json for old WordPress URLs (32 redirects mapped)
 - [ ] T8.3 - Set up subdomain redirects (points.vadospeedwaypark.com -> /points, results. -> /results)
 - [ ] T8.4 - Point vadospeedwaypark.com DNS to Vercel (A: 76.76.21.21, www CNAME: cname.vercel-dns.com)
 - [ ] T8.5 - Verify SSL provisioning

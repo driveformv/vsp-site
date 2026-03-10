@@ -1,18 +1,22 @@
 import Link from 'next/link';
 
-const QUICK_LINKS = [
-  { label: 'Schedule', href: '/schedule' },
-  { label: 'Results', href: '/results' },
-  { label: 'Points', href: '/points' },
-  { label: 'News', href: '/news' },
-];
+interface NavLink {
+  label: string;
+  href: string;
+}
 
-const VISIT_LINKS = [
-  { label: 'Plan Your Visit', href: '/visit' },
-  { label: 'Directions', href: '/directions' },
-  { label: 'Suites', href: '/suites' },
-  { label: 'Contact', href: '/contact' },
-];
+interface FooterProps {
+  phone?: string;
+  email?: string;
+  address?: string;
+  socialLinks?: {
+    facebook?: string;
+    instagram?: string;
+    youtube?: string;
+    twitter?: string;
+  };
+  navLinks?: NavLink[];
+}
 
 function FacebookIcon() {
   return (
@@ -38,7 +42,35 @@ function YouTubeIcon() {
   );
 }
 
-export default function Footer() {
+const DEFAULT_NAV: NavLink[] = [
+  { label: 'Schedule', href: '/events' },
+  { label: 'Results', href: '/results' },
+  { label: 'Points', href: '/points' },
+  { label: 'News', href: '/news' },
+];
+
+const VISIT_LINKS: NavLink[] = [
+  { label: 'Plan Your Visit', href: '/plan-your-visit' },
+  { label: 'Drivers', href: '/drivers' },
+  { label: 'Sponsors', href: '/sponsors' },
+  { label: 'About', href: '/about' },
+];
+
+export default function Footer({
+  phone,
+  email,
+  address,
+  socialLinks,
+  navLinks,
+}: FooterProps) {
+  const quickLinks = navLinks && navLinks.length > 0
+    ? navLinks.slice(0, 4)
+    : DEFAULT_NAV;
+
+  const facebookUrl = socialLinks?.facebook || 'https://facebook.com/vadospeedwaypark';
+  const instagramUrl = socialLinks?.instagram || 'https://instagram.com/vadospeedwaypark';
+  const youtubeUrl = socialLinks?.youtube || 'https://youtube.com/@vadospeedwaypark';
+
   return (
     <footer
       style={{
@@ -68,7 +100,7 @@ export default function Footer() {
             </p>
             <div className="flex items-center gap-4 mt-1">
               <a
-                href="https://facebook.com/vadospeedwaypark"
+                href={facebookUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="transition-opacity duration-200 hover:opacity-70"
@@ -78,7 +110,7 @@ export default function Footer() {
                 <FacebookIcon />
               </a>
               <a
-                href="https://instagram.com/vadospeedwaypark"
+                href={instagramUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="transition-opacity duration-200 hover:opacity-70"
@@ -88,7 +120,7 @@ export default function Footer() {
                 <InstagramIcon />
               </a>
               <a
-                href="https://youtube.com/@vadospeedwaypark"
+                href={youtubeUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="transition-opacity duration-200 hover:opacity-70"
@@ -109,7 +141,7 @@ export default function Footer() {
               Quick Links
             </h3>
             <ul className="flex flex-col gap-3">
-              {QUICK_LINKS.map((link) => (
+              {quickLinks.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
@@ -155,27 +187,30 @@ export default function Footer() {
               Contact
             </h3>
             <ul className="flex flex-col gap-3 text-sm" style={{ color: '#86868B' }}>
-              <li>
-                <a
-                  href="tel:+15755551234"
-                  className="transition-colors duration-200 hover:text-white"
-                  style={{ color: '#86868B' }}
-                >
-                  (575) 555-1234
-                </a>
-              </li>
-              <li>
-                <a
-                  href="mailto:info@vadospeedwaypark.com"
-                  className="transition-colors duration-200 hover:text-white"
-                  style={{ color: '#86868B' }}
-                >
-                  info@vadospeedwaypark.com
-                </a>
-              </li>
-              <li className="leading-relaxed">
-                22200 Stern Dr<br />
-                Vado, NM 88072
+              {phone && (
+                <li>
+                  <a
+                    href={`tel:${phone}`}
+                    className="transition-colors duration-200 hover:text-white"
+                    style={{ color: '#86868B' }}
+                  >
+                    {phone}
+                  </a>
+                </li>
+              )}
+              {email && (
+                <li>
+                  <a
+                    href={`mailto:${email}`}
+                    className="transition-colors duration-200 hover:text-white"
+                    style={{ color: '#86868B' }}
+                  >
+                    {email}
+                  </a>
+                </li>
+              )}
+              <li className="leading-relaxed whitespace-pre-line">
+                {address || '22200 Stern Dr\nVado, NM 88072'}
               </li>
             </ul>
           </div>
@@ -192,10 +227,10 @@ export default function Footer() {
           style={{ maxWidth: 1280 }}
         >
           <p className="text-xs" style={{ color: '#86868B' }}>
-            2026 Vado Speedway Park. All rights reserved.
+            {new Date().getFullYear()} Vado Speedway Park. All rights reserved.
           </p>
           <Link
-            href="/become-a-sponsor"
+            href="/sponsors"
             className="text-xs font-medium transition-colors duration-200 hover:text-white"
             style={{ color: '#86868B' }}
           >

@@ -3,23 +3,39 @@
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 
-interface StickyNavProps {
-  transparent?: boolean;
+interface NavLink {
+  label: string;
+  href: string;
+  isExternal?: boolean;
 }
 
-const NAV_LINKS = [
-  { label: 'Schedule', href: '/schedule' },
+interface StickyNavProps {
+  transparent?: boolean;
+  links?: NavLink[];
+  ticketUrl?: string;
+  streamUrl?: string;
+}
+
+const DEFAULT_LINKS: NavLink[] = [
+  { label: 'Schedule', href: '/events' },
   { label: 'Results', href: '/results' },
   { label: 'Points', href: '/points' },
   { label: 'News', href: '/news' },
-  { label: 'Plan Your Visit', href: '/visit' },
+  { label: 'Plan Your Visit', href: '/plan-your-visit' },
   { label: 'Drivers', href: '/drivers' },
   { label: 'Sponsors', href: '/sponsors' },
 ];
 
-export default function StickyNav({ transparent = false }: StickyNavProps) {
+export default function StickyNav({
+  transparent = false,
+  links,
+  ticketUrl = '/events',
+  streamUrl = '#',
+}: StickyNavProps) {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  const navLinks = links && links.length > 0 ? links : DEFAULT_LINKS;
 
   const handleScroll = useCallback(() => {
     setScrolled(window.scrollY > 40);
@@ -70,25 +86,43 @@ export default function StickyNav({ transparent = false }: StickyNavProps) {
 
           {/* Desktop Nav Links */}
           <div className="hidden lg:flex items-center gap-6">
-            {NAV_LINKS.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="text-sm font-medium transition-colors duration-200 hover:opacity-80"
-                style={{
-                  fontFamily: 'var(--font-body, Inter, sans-serif)',
-                  color: isTransparent ? '#FFF' : 'var(--color-text)',
-                }}
-              >
-                {link.label}
-              </Link>
-            ))}
+            {navLinks.map((link) =>
+              link.isExternal ? (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm font-medium transition-colors duration-200 hover:opacity-80"
+                  style={{
+                    fontFamily: 'var(--font-body, Inter, sans-serif)',
+                    color: isTransparent ? '#FFF' : 'var(--color-text)',
+                  }}
+                >
+                  {link.label}
+                </a>
+              ) : (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className="text-sm font-medium transition-colors duration-200 hover:opacity-80"
+                  style={{
+                    fontFamily: 'var(--font-body, Inter, sans-serif)',
+                    color: isTransparent ? '#FFF' : 'var(--color-text)',
+                  }}
+                >
+                  {link.label}
+                </Link>
+              )
+            )}
           </div>
 
           {/* Desktop CTAs */}
           <div className="hidden lg:flex items-center gap-3">
-            <Link
-              href="/tickets"
+            <a
+              href={ticketUrl}
+              target={ticketUrl.startsWith('http') ? '_blank' : undefined}
+              rel={ticketUrl.startsWith('http') ? 'noopener noreferrer' : undefined}
               className="px-5 py-2 text-sm font-semibold rounded transition-opacity duration-200 hover:opacity-90"
               style={{
                 fontFamily: 'var(--font-body, Inter, sans-serif)',
@@ -97,9 +131,11 @@ export default function StickyNav({ transparent = false }: StickyNavProps) {
               }}
             >
               Buy Tickets
-            </Link>
-            <Link
-              href="/watch"
+            </a>
+            <a
+              href={streamUrl}
+              target={streamUrl.startsWith('http') ? '_blank' : undefined}
+              rel={streamUrl.startsWith('http') ? 'noopener noreferrer' : undefined}
               className="px-5 py-2 text-sm font-semibold rounded transition-opacity duration-200 hover:opacity-90"
               style={{
                 fontFamily: 'var(--font-body, Inter, sans-serif)',
@@ -108,7 +144,7 @@ export default function StickyNav({ transparent = false }: StickyNavProps) {
               }}
             >
               Watch Live
-            </Link>
+            </a>
           </div>
 
           {/* Mobile Hamburger */}
@@ -174,26 +210,46 @@ export default function StickyNav({ transparent = false }: StickyNavProps) {
 
         {/* Mobile Links */}
         <div className="flex flex-col px-6 pb-8">
-          {NAV_LINKS.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              onClick={() => setMobileOpen(false)}
-              className="py-3 text-base font-medium border-b"
-              style={{
-                fontFamily: 'var(--font-body, Inter, sans-serif)',
-                color: 'var(--color-text)',
-                borderColor: 'var(--color-border)',
-              }}
-            >
-              {link.label}
-            </Link>
-          ))}
+          {navLinks.map((link) =>
+            link.isExternal ? (
+              <a
+                key={link.href}
+                href={link.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setMobileOpen(false)}
+                className="py-3 text-base font-medium border-b"
+                style={{
+                  fontFamily: 'var(--font-body, Inter, sans-serif)',
+                  color: 'var(--color-text)',
+                  borderColor: 'var(--color-border)',
+                }}
+              >
+                {link.label}
+              </a>
+            ) : (
+              <Link
+                key={link.href}
+                href={link.href}
+                onClick={() => setMobileOpen(false)}
+                className="py-3 text-base font-medium border-b"
+                style={{
+                  fontFamily: 'var(--font-body, Inter, sans-serif)',
+                  color: 'var(--color-text)',
+                  borderColor: 'var(--color-border)',
+                }}
+              >
+                {link.label}
+              </Link>
+            )
+          )}
 
           {/* Mobile CTAs */}
           <div className="flex flex-col gap-3 mt-8">
-            <Link
-              href="/tickets"
+            <a
+              href={ticketUrl}
+              target={ticketUrl.startsWith('http') ? '_blank' : undefined}
+              rel={ticketUrl.startsWith('http') ? 'noopener noreferrer' : undefined}
               onClick={() => setMobileOpen(false)}
               className="px-5 py-3 text-center text-sm font-semibold rounded transition-opacity duration-200 hover:opacity-90"
               style={{
@@ -203,9 +259,11 @@ export default function StickyNav({ transparent = false }: StickyNavProps) {
               }}
             >
               Buy Tickets
-            </Link>
-            <Link
-              href="/watch"
+            </a>
+            <a
+              href={streamUrl}
+              target={streamUrl.startsWith('http') ? '_blank' : undefined}
+              rel={streamUrl.startsWith('http') ? 'noopener noreferrer' : undefined}
               onClick={() => setMobileOpen(false)}
               className="px-5 py-3 text-center text-sm font-semibold rounded transition-opacity duration-200 hover:opacity-90"
               style={{
@@ -215,7 +273,7 @@ export default function StickyNav({ transparent = false }: StickyNavProps) {
               }}
             >
               Watch Live
-            </Link>
+            </a>
           </div>
         </div>
       </div>

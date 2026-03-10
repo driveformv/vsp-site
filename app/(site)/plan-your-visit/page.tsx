@@ -1,63 +1,46 @@
-'use client';
-
+import { PortableText, type PortableTextBlock } from '@portabletext/react';
+import { sanityFetch } from '@/sanity/lib/fetch';
+import { firstTimerGuideQuery, siteSettingsQuery } from '@/sanity/lib/queries';
+import { urlFor } from '@/sanity/lib/image';
 import {
   PageHero,
   SectionBlock,
   BreadcrumbBar,
-  AccordionGroup,
   CTABanner,
 } from '@/components/ui';
+import PlanYourVisitFAQ from './PlanYourVisitFAQ';
 
-const faqItems = [
-  {
-    title: 'What time should I arrive?',
-    content: (
-      <p>
-        Gates typically open 1.5 to 2 hours before the first green flag. Arriving early
-        gives you time to find parking, grab food, and settle into your seats before
-        hot laps begin.
-      </p>
-    ),
-  },
-  {
-    title: 'Can I bring outside food and drinks?',
-    content: (
-      <p>
-        Small personal coolers are permitted in the grandstand area. No glass containers.
-        The concession stand offers a full menu if you prefer to grab something on-site.
-      </p>
-    ),
-  },
-  {
-    title: 'Is there reserved seating?',
-    content: (
-      <p>
-        General admission is first-come, first-served in the main grandstand. Suite
-        rentals are available for groups and corporate events -- contact the track office
-        for availability.
-      </p>
-    ),
-  },
-  {
-    title: 'Are pets allowed?',
-    content: (
-      <p>
-        Service animals are welcome. For the safety and comfort of all guests, pets are
-        not permitted in the grandstand or pit areas.
-      </p>
-    ),
-  },
-  {
-    title: 'What payment methods are accepted?',
-    content: (
-      <p>
-        Cash and all major credit/debit cards are accepted at the gate and concession stands.
-      </p>
-    ),
-  },
-];
+interface GuideSection {
+  title: string;
+  body?: PortableTextBlock[];
+  image?: { asset: { _ref: string } };
+}
 
-export default function PlanYourVisitPage() {
+interface FAQItem {
+  question: string;
+  answer: string;
+}
+
+interface FirstTimerGuide {
+  sections?: GuideSection[];
+  faqItems?: FAQItem[];
+}
+
+interface SiteSettings {
+  address?: string;
+  phone?: string;
+  email?: string;
+}
+
+export default async function PlanYourVisitPage() {
+  const [guide, settings] = await Promise.all([
+    sanityFetch<FirstTimerGuide | null>({ query: firstTimerGuideQuery, tags: ['firstTimerGuide'] }),
+    sanityFetch<SiteSettings | null>({ query: siteSettingsQuery, tags: ['siteSettings'] }),
+  ]);
+
+  const sections = guide?.sections || [];
+  const faqItems = guide?.faqItems || [];
+
   return (
     <>
       <PageHero
@@ -72,82 +55,84 @@ export default function PlanYourVisitPage() {
         ]}
       />
 
-      {/* What to Expect */}
-      <SectionBlock variant="white">
-        <h2
-          className="mb-4 text-2xl font-bold uppercase tracking-tight text-[var(--color-text)]"
-          style={{ fontFamily: 'var(--font-display)' }}
-        >
-          What to Expect
-        </h2>
-        <p className="max-w-3xl leading-relaxed text-[var(--color-text-muted)]">
-          Vado Speedway Park is a 3/8-mile semi-banked clay oval located in Vado, New
-          Mexico. Race nights feature multiple divisions of high-energy dirt track
-          competition under the lights. The atmosphere is family-friendly, loud, and
-          unforgettable. Whether you are a lifelong fan or visiting for the first time,
-          you will feel the excitement from the moment you walk through the gate.
-        </p>
-      </SectionBlock>
-
-      {/* What to Bring */}
-      <SectionBlock variant="grey">
-        <h2
-          className="mb-4 text-2xl font-bold uppercase tracking-tight text-[var(--color-text)]"
-          style={{ fontFamily: 'var(--font-display)' }}
-        >
-          What to Bring
-        </h2>
-        <div className="grid max-w-3xl gap-4 sm:grid-cols-2">
-          {[
-            'Ear protection (it gets loud)',
-            'Sunscreen for early gates',
-            'Closed-toe shoes',
-            'Layers -- desert nights cool down fast',
-            'Small cooler (no glass)',
-            'Seat cushion for bleachers',
-            'Cash and cards accepted',
-            'Camera (no flash during racing)',
-          ].map((item) => (
-            <div key={item} className="flex items-start gap-2 text-sm text-[var(--color-text-muted)]">
-              <span className="mt-0.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--color-accent)]" />
-              {item}
+      {/* Dynamic guide sections from Sanity */}
+      {sections.length > 0 ? (
+        sections.map((section, idx) => (
+          <SectionBlock key={idx} variant={idx % 2 === 0 ? 'white' : 'grey'}>
+            <h2
+              className="mb-4 text-2xl font-bold uppercase tracking-tight text-[var(--color-text)]"
+              style={{ fontFamily: 'var(--font-display)' }}
+            >
+              {section.title}
+            </h2>
+            <div className="grid max-w-4xl gap-8 lg:grid-cols-2">
+              <div className="prose prose-sm max-w-none text-[var(--color-text-muted)]">
+                {section.body ? (
+                  <PortableText value={section.body} />
+                ) : (
+                  <p>Content coming soon.</p>
+                )}
+              </div>
+              {section.image && (
+                <div className="overflow-hidden rounded-lg">
+                  <img
+                    src={urlFor(section.image).width(640).height(400).url()}
+                    alt={section.title}
+                    className="h-full w-full object-cover"
+                  />
+                </div>
+              )}
             </div>
-          ))}
-        </div>
-      </SectionBlock>
+          </SectionBlock>
+        ))
+      ) : (
+        <>
+          {/* Fallback static content when no Sanity data */}
+          <SectionBlock variant="white">
+            <h2
+              className="mb-4 text-2xl font-bold uppercase tracking-tight text-[var(--color-text)]"
+              style={{ fontFamily: 'var(--font-display)' }}
+            >
+              What to Expect
+            </h2>
+            <p className="max-w-3xl leading-relaxed text-[var(--color-text-muted)]">
+              Vado Speedway Park is a 3/8-mile semi-banked clay oval located in Vado, New
+              Mexico. Race nights feature multiple divisions of high-energy dirt track
+              competition under the lights. The atmosphere is family-friendly, loud, and
+              unforgettable.
+            </p>
+          </SectionBlock>
 
-      {/* Flag Guide */}
-      <SectionBlock variant="white">
-        <h2
-          className="mb-4 text-2xl font-bold uppercase tracking-tight text-[var(--color-text)]"
-          style={{ fontFamily: 'var(--font-display)' }}
-        >
-          Flag Guide
-        </h2>
-        <p className="mb-6 max-w-3xl text-sm text-[var(--color-text-muted)]">
-          Racing flags communicate with drivers throughout each race. Here is what they mean.
-        </p>
-        <div className="grid max-w-3xl gap-4 sm:grid-cols-2">
-          {[
-            { flag: 'Green', meaning: 'Race is underway / restart' },
-            { flag: 'Yellow', meaning: 'Caution -- slow down, no passing' },
-            { flag: 'Red', meaning: 'Stop immediately on the track' },
-            { flag: 'White', meaning: 'One lap remaining' },
-            { flag: 'Checkered', meaning: 'Race is complete' },
-            { flag: 'Black', meaning: 'Driver must report to pits' },
-          ].map(({ flag, meaning }) => (
-            <div key={flag} className="flex items-start gap-3 text-sm">
-              <span className="shrink-0 font-bold uppercase tracking-wider text-[var(--color-text)]">
-                {flag}
-              </span>
-              <span className="text-[var(--color-text-muted)]">{meaning}</span>
+          <SectionBlock variant="grey">
+            <h2
+              className="mb-4 text-2xl font-bold uppercase tracking-tight text-[var(--color-text)]"
+              style={{ fontFamily: 'var(--font-display)' }}
+            >
+              What to Bring
+            </h2>
+            <div className="grid max-w-3xl gap-4 sm:grid-cols-2">
+              {[
+                'Ear protection (it gets loud)',
+                'Sunscreen for early gates',
+                'Closed-toe shoes',
+                'Layers -- desert nights cool down fast',
+                'Small cooler (no glass)',
+                'Seat cushion for bleachers',
+                'Cash and cards accepted',
+                'Camera (no flash during racing)',
+              ].map((item) => (
+                <div key={item} className="flex items-start gap-2 text-sm text-[var(--color-text-muted)]">
+                  <span className="mt-0.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--color-accent)]" />
+                  {item}
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
-      </SectionBlock>
+          </SectionBlock>
+        </>
+      )}
 
       {/* Getting Here */}
-      <SectionBlock variant="grey">
+      <SectionBlock variant={sections.length > 0 ? (sections.length % 2 === 0 ? 'white' : 'grey') : 'white'}>
         <h2
           className="mb-4 text-2xl font-bold uppercase tracking-tight text-[var(--color-text)]"
           style={{ fontFamily: 'var(--font-display)' }}
@@ -167,7 +152,7 @@ export default function PlanYourVisitPage() {
               Address
             </p>
             <p className="mt-1 text-sm text-[var(--color-text-muted)]">
-              Vado Speedway Park, Vado, NM 88072
+              {settings?.address || 'Vado Speedway Park, Vado, NM 88072'}
             </p>
             <a
               href="https://maps.google.com/?q=Vado+Speedway+Park"
@@ -183,7 +168,7 @@ export default function PlanYourVisitPage() {
       </SectionBlock>
 
       {/* Tickets & Pricing */}
-      <SectionBlock variant="white">
+      <SectionBlock variant="grey">
         <h2
           className="mb-4 text-2xl font-bold uppercase tracking-tight text-[var(--color-text)]"
           style={{ fontFamily: 'var(--font-display)' }}
@@ -211,34 +196,40 @@ export default function PlanYourVisitPage() {
         </div>
       </SectionBlock>
 
-      {/* Suites */}
-      <SectionBlock variant="grey">
-        <h2
-          className="mb-4 text-2xl font-bold uppercase tracking-tight text-[var(--color-text)]"
-          style={{ fontFamily: 'var(--font-display)' }}
-        >
-          Suites &amp; Group Packages
-        </h2>
-        <p className="max-w-3xl text-sm text-[var(--color-text-muted)]">
-          Host your next corporate outing, birthday party, or private event in one of
-          our track-side suites. Packages include reserved seating, catering options,
-          and pit access for your group. Contact the track office for availability and
-          pricing.
-        </p>
-      </SectionBlock>
-
       {/* FAQ */}
-      <SectionBlock variant="white">
-        <h2
-          className="mb-6 text-2xl font-bold uppercase tracking-tight text-[var(--color-text)]"
-          style={{ fontFamily: 'var(--font-display)' }}
-        >
-          Frequently Asked Questions
-        </h2>
-        <div className="max-w-3xl">
-          <AccordionGroup items={faqItems} />
-        </div>
-      </SectionBlock>
+      {faqItems.length > 0 ? (
+        <SectionBlock variant="white">
+          <h2
+            className="mb-6 text-2xl font-bold uppercase tracking-tight text-[var(--color-text)]"
+            style={{ fontFamily: 'var(--font-display)' }}
+          >
+            Frequently Asked Questions
+          </h2>
+          <div className="max-w-3xl">
+            <PlanYourVisitFAQ items={faqItems} />
+          </div>
+        </SectionBlock>
+      ) : (
+        <SectionBlock variant="white">
+          <h2
+            className="mb-6 text-2xl font-bold uppercase tracking-tight text-[var(--color-text)]"
+            style={{ fontFamily: 'var(--font-display)' }}
+          >
+            Frequently Asked Questions
+          </h2>
+          <div className="max-w-3xl">
+            <PlanYourVisitFAQ
+              items={[
+                { question: 'What time should I arrive?', answer: 'Gates typically open 1.5 to 2 hours before the first green flag. Arriving early gives you time to find parking, grab food, and settle into your seats before hot laps begin.' },
+                { question: 'Can I bring outside food and drinks?', answer: 'Small personal coolers are permitted in the grandstand area. No glass containers. The concession stand offers a full menu if you prefer to grab something on-site.' },
+                { question: 'Is there reserved seating?', answer: 'General admission is first-come, first-served in the main grandstand. Suite rentals are available for groups and corporate events -- contact the track office for availability.' },
+                { question: 'Are pets allowed?', answer: 'Service animals are welcome. For the safety and comfort of all guests, pets are not permitted in the grandstand or pit areas.' },
+                { question: 'What payment methods are accepted?', answer: 'Cash and all major credit/debit cards are accepted at the gate and concession stands.' },
+              ]}
+            />
+          </div>
+        </SectionBlock>
+      )}
 
       <CTABanner
         title="Ready for Race Night?"

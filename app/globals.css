@@ -129,3 +129,23 @@ img {
 *::after {
   box-sizing: border-box;
 }
+
+.section-title-accent::after {
+  content: '';
+  display: block;
+  width: 60px;
+  height: 4px;
+  background-color: var(--color-accent);
+  margin-top: 12px;
+}
+
+.section-title-accent-center::after {
+  content: '';
+  display: block;
+  width: 60px;
+  height: 4px;
+  background-color: var(--color-accent);
+  margin-top: 12px;
+  margin-left: auto;
+  margin-right: auto;
+}

@@ -1,95 +1,107 @@
-'use client';
-
 import Link from 'next/link';
+import { sanityFetch } from '@/sanity/lib/fetch';
+import { upcomingEventsQuery, newsPostsQuery, sponsorsQuery, siteSettingsQuery } from '@/sanity/lib/queries';
+import { urlFor } from '@/sanity/lib/image';
 import {
   PageHero,
   SectionBlock,
   EventCard,
   NewsCard,
+  NewsListItem,
   SponsorStrip,
   CTABanner,
 } from '@/components/ui';
+import EmailSignup from './EmailSignup';
+import FanProgramForm from './FanProgramForm';
+import { LocalBusinessJsonLd } from '@/components/seo/JsonLd';
 
-const upcomingEvents = [
-  {
-    title: 'Saturday Night Thunder',
-    date: '2026-03-14',
-    classes: ['Modifieds', 'Stock Cars', 'Hobby Stocks'],
-    gateTime: '5:00 PM',
-    raceTime: '7:00 PM',
-    ticketLink: '#',
-    slug: 'saturday-night-thunder-03-14',
-  },
-  {
-    title: 'Sprint Car Showdown',
-    date: '2026-03-21',
-    classes: ['Sprint Cars', 'Modifieds', 'Sport Mods'],
-    gateTime: '4:30 PM',
-    raceTime: '6:30 PM',
-    ticketLink: '#',
-    slug: 'sprint-car-showdown-03-21',
-  },
-  {
-    title: 'Easter Classic',
-    date: '2026-04-04',
-    classes: ['Modifieds', 'Stock Cars', 'Hobby Stocks', 'Mini Stocks'],
-    gateTime: '4:00 PM',
-    raceTime: '6:00 PM',
-    ticketLink: '#',
-    slug: 'easter-classic-04-04',
-  },
-];
+interface SanityEvent {
+  _id: string;
+  title: string;
+  slug: { current: string };
+  date: string;
+  gateTime?: string;
+  raceTime?: string;
+  raceClasses?: { sponsorName?: string; className: string }[];
+  image?: { asset: { _ref: string } };
+  ticketLink?: string;
+}
 
-const latestNews = [
-  {
-    title: '2026 Season Opener Sets New Attendance Record',
-    category: 'Announcement',
-    date: '2026-03-01',
-    excerpt:
-      'Vado Speedway Park kicked off the 2026 season with a record crowd as fans packed the grandstands for an unforgettable night of dirt track racing.',
-    slug: '2026-season-opener-record',
-  },
-  {
-    title: 'Modified Division Points Battle Tightens',
-    category: 'Results',
-    date: '2026-02-22',
-    excerpt:
-      'Three drivers are separated by just 15 points heading into March, setting up one of the closest championship races in recent memory.',
-    slug: 'modified-points-battle',
-  },
-  {
-    title: 'New Pit Facility Upgrades Complete',
-    category: 'Feature',
-    date: '2026-02-15',
-    excerpt:
-      'Expanded pit area with improved drainage, new concrete pads, and upgraded electrical service now available for all competitors.',
-    slug: 'pit-facility-upgrades',
-  },
-];
+interface SanityNewsPost {
+  _id: string;
+  title: string;
+  slug: { current: string };
+  category?: string;
+  featuredImage?: { asset: { _ref: string } };
+  publishDate?: string;
+  excerpt?: string;
+}
 
-const sponsors = [
-  { name: 'Sponsor A', logo: '/sponsors/placeholder.svg', tier: 'Title' },
-  { name: 'Sponsor B', logo: '/sponsors/placeholder.svg', tier: 'Title' },
-  { name: 'Sponsor C', logo: '/sponsors/placeholder.svg', tier: 'Gold' },
-  { name: 'Sponsor D', logo: '/sponsors/placeholder.svg', tier: 'Gold' },
-  { name: 'Sponsor E', logo: '/sponsors/placeholder.svg', tier: 'Gold' },
-];
+interface SanitySponsor {
+  _id: string;
+  name: string;
+  logo: { asset: { _ref: string } };
+  tier?: string;
+  websiteUrl?: string;
+}
 
-export default function HomePage() {
+interface SiteSettings {
+  ticketUrl?: string;
+}
+
+export default async function HomePage() {
+  const [events, posts, sponsors, settings] = await Promise.all([
+    sanityFetch<SanityEvent[]>({ query: upcomingEventsQuery, tags: ['event'] }),
+    sanityFetch<SanityNewsPost[]>({ query: newsPostsQuery, tags: ['newsPost'] }),
+    sanityFetch<SanitySponsor[]>({ query: sponsorsQuery, tags: ['sponsor'] }),
+    sanityFetch<SiteSettings | null>({ query: siteSettingsQuery, tags: ['siteSettings'] }),
+  ]);
+
+  const upcomingEvents = (events || []).slice(0, 3).map((e) => ({
+    title: e.title,
+    date: e.date,
+    classes: (e.raceClasses || []).map((c) => c.className),
+    gateTime: e.gateTime,
+    raceTime: e.raceTime,
+    ticketLink: e.ticketLink,
+    image: e.image ? urlFor(e.image).width(640).height(360).url() : undefined,
+    slug: e.slug.current,
+  }));
+
+  const latestNews = (posts || []).slice(0, 5).map((p) => ({
+    title: p.title,
+    category: p.category || 'News',
+    date: p.publishDate || '',
+    excerpt: p.excerpt || '',
+    image: p.featuredImage ? urlFor(p.featuredImage).width(640).height(400).url() : undefined,
+    slug: p.slug.current,
+  }));
+
+  const sponsorList = (sponsors || []).map((s) => ({
+    name: s.name,
+    logo: s.logo ? urlFor(s.logo).width(320).height(160).url() : '/sponsors/placeholder.svg',
+    tier: s.tier ? s.tier.charAt(0).toUpperCase() + s.tier.slice(1) : 'Partner',
+    url: s.websiteUrl,
+  }));
+
+  const ticketUrl = settings?.ticketUrl || '/events';
+
   return (
     <>
-      {/* Hero */}
+      <LocalBusinessJsonLd />
       <PageHero
         title="Fuel Your Passion for Speed"
         subtitle="New Mexico's Premier Dirt Track Racing Venue"
       >
-        <Link
-          href="/events"
-          className="rounded bg-[var(--color-accent)] px-6 py-3 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:bg-red-700"
+        <a
+          href={ticketUrl}
+          target={ticketUrl.startsWith('http') ? '_blank' : undefined}
+          rel={ticketUrl.startsWith('http') ? 'noopener noreferrer' : undefined}
+          className="rounded border-2 border-white px-6 py-3 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:bg-white/10"
           style={{ fontFamily: 'var(--font-display)' }}
         >
           Buy Tickets
-        </Link>
+        </a>
         <a
           href="https://maps.google.com/?q=Vado+Speedway+Park"
           target="_blank"
@@ -104,16 +116,22 @@ export default function HomePage() {
       {/* Upcoming Events */}
       <SectionBlock variant="grey">
         <h2
-          className="mb-8 text-2xl font-bold uppercase tracking-tight text-[var(--color-text)] md:text-3xl"
+          className="section-title-accent mb-8 text-2xl font-bold uppercase tracking-tight text-[var(--color-text)] md:text-3xl"
           style={{ fontFamily: 'var(--font-display)' }}
         >
           Upcoming Events
         </h2>
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {upcomingEvents.map((event) => (
-            <EventCard key={event.slug} {...event} />
-          ))}
-        </div>
+        {upcomingEvents.length > 0 ? (
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {upcomingEvents.map((event) => (
+              <EventCard key={event.slug} {...event} />
+            ))}
+          </div>
+        ) : (
+          <p className="text-sm text-[var(--color-text-muted)]">
+            No upcoming events scheduled. Check back soon.
+          </p>
+        )}
         <div className="mt-8 text-center">
           <Link
             href="/events"
@@ -128,16 +146,28 @@ export default function HomePage() {
       {/* Latest News */}
       <SectionBlock variant="white">
         <h2
-          className="mb-8 text-2xl font-bold uppercase tracking-tight text-[var(--color-text)] md:text-3xl"
+          className="section-title-accent mb-8 text-2xl font-bold uppercase tracking-tight text-[var(--color-text)] md:text-3xl"
           style={{ fontFamily: 'var(--font-display)' }}
         >
           Latest News
         </h2>
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {latestNews.map((article) => (
-            <NewsCard key={article.slug} {...article} />
-          ))}
-        </div>
+        {latestNews.length > 0 ? (
+          <div className="divide-y divide-[var(--color-border)]">
+            {latestNews.map((article) => (
+              <NewsListItem
+                key={article.slug}
+                title={article.title}
+                date={article.date}
+                image={article.image}
+                slug={article.slug}
+              />
+            ))}
+          </div>
+        ) : (
+          <p className="text-sm text-[var(--color-text-muted)]">
+            No news posts yet.
+          </p>
+        )}
         <div className="mt-8 text-center">
           <Link
             href="/news"
@@ -149,7 +179,6 @@ export default function HomePage() {
         </div>
       </SectionBlock>
 
-      {/* CTA Banner */}
       <CTABanner
         title="New to Dirt Racing?"
         description="Everything you need to know for your first visit to Vado Speedway Park."
@@ -160,12 +189,18 @@ export default function HomePage() {
       {/* Sponsors */}
       <SectionBlock variant="grey">
         <h2
-          className="mb-8 text-center text-2xl font-bold uppercase tracking-tight text-[var(--color-text)] md:text-3xl"
+          className="section-title-accent-center mb-8 text-center text-2xl font-bold uppercase tracking-tight text-[var(--color-text)] md:text-3xl"
           style={{ fontFamily: 'var(--font-display)' }}
         >
           Our Partners
         </h2>
-        <SponsorStrip sponsors={sponsors} />
+        {sponsorList.length > 0 ? (
+          <SponsorStrip sponsors={sponsorList} />
+        ) : (
+          <p className="text-center text-sm text-[var(--color-text-muted)]">
+            Sponsor information coming soon.
+          </p>
+        )}
         <div className="mt-8 text-center">
           <Link
             href="/sponsors"
@@ -177,33 +212,26 @@ export default function HomePage() {
         </div>
       </SectionBlock>
 
-      {/* Email Signup */}
+      {/* Fan Program */}
       <SectionBlock variant="white">
-        <div className="mx-auto max-w-xl text-center">
-          <h2
-            className="mb-3 text-2xl font-bold uppercase tracking-tight text-[var(--color-text)] md:text-3xl"
-            style={{ fontFamily: 'var(--font-display)' }}
-          >
-            Don&apos;t Miss Out
-          </h2>
-          <p className="mb-6 text-sm text-[var(--color-text-muted)]">
-            Get race schedules, results, and exclusive updates delivered to your inbox.
-          </p>
-          <form className="flex flex-col gap-3 sm:flex-row">
-            <input
-              type="email"
-              placeholder="Your email address"
-              className="flex-1 rounded border border-[var(--color-border)] px-4 py-3 text-sm text-[var(--color-text)] outline-none transition-colors placeholder:text-[var(--color-text-muted)] focus:border-[var(--color-text)]"
-            />
-            <button
-              type="submit"
-              className="rounded bg-[var(--color-accent)] px-6 py-3 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:bg-red-700"
-              style={{ fontFamily: 'var(--font-display)' }}
-            >
-              Subscribe
-            </button>
-          </form>
+        <h2
+          className="section-title-accent mb-4 text-2xl font-bold uppercase tracking-tight text-[var(--color-text)] md:text-3xl"
+          style={{ fontFamily: 'var(--font-display)' }}
+        >
+          Fan Program
+        </h2>
+        <p className="mb-6 max-w-3xl text-sm text-[var(--color-text-muted)]">
+          Join the Vado Speedway Park Fan Program for exclusive updates, promotions,
+          and early access to special event tickets.
+        </p>
+        <div className="max-w-xl">
+          <FanProgramForm />
         </div>
+      </SectionBlock>
+
+      {/* Email Signup */}
+      <SectionBlock variant="grey">
+        <EmailSignup />
       </SectionBlock>
     </>
   );

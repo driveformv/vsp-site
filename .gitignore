@@ -39,6 +39,9 @@ Website Layout.jpg
 vado-rebuild-plan.docx
 wp-content-inventory/
 
+# media downloads (9.3 GB from WordPress)
+wp-media/
+
 # vercel
 .vercel
 
@@ -46,3 +49,4 @@ wp-content-inventory/
 *.tsbuildinfo
 next-env.d.ts
 vado-ai-validation.docx
+data/
