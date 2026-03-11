@@ -23,7 +23,7 @@ def get_token():
     with open(env_path) as f:
         for line in f:
             if line.startswith("SANITY_TOKEN="):
-                return line.strip().split("=", 1)[1]
+                return line.strip().split("=", 1)[1].strip('"').strip("'")
     raise ValueError("SANITY_TOKEN not found in .env.local")
 
 def upload_image(file_path, token):

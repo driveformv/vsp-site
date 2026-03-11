@@ -25,9 +25,9 @@ def get_tokens():
     with open(env_path) as f:
         for line in f:
             if line.startswith("SANITY_TOKEN="):
-                tokens["write"] = line.strip().split("=", 1)[1]
+                tokens["write"] = line.strip().split("=", 1)[1].strip('"').strip("'")
             elif line.startswith("SANITY_API_READ_TOKEN="):
-                tokens["read"] = line.strip().split("=", 1)[1]
+                tokens["read"] = line.strip().split("=", 1)[1].strip('"').strip("'")
     return tokens
 
 def scrape_og_image(slug):
