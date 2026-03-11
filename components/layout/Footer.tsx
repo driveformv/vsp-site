@@ -60,7 +60,7 @@ export default function Footer({
       {/* Background image */}
       <div
         className="absolute inset-0 h-full w-full bg-cover bg-center"
-        style={{ backgroundImage: 'url(/footer-bg.jpg)' }}
+        style={{ backgroundImage: 'url(https://cdn.sanity.io/images/jsftjck0/production/864b66113de79812ec33b19ea4e81a6de9c8e0ee-1440x960.jpg)' }}
       />
       <div className="absolute inset-0 bg-black/80" />
 

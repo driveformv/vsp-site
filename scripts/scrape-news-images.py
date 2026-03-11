@@ -32,23 +32,34 @@ def get_tokens():
 
 def scrape_og_image(slug):
     url = f"https://vadospeedwaypark.com/{slug}/"
-    try:
-        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
-        with urllib.request.urlopen(req, timeout=10) as resp:
-            final_url = resp.url
-            # Skip if redirected to external site
-            if "vadospeedwaypark.com" not in final_url:
-                return None
-            html = resp.read().decode("utf-8", errors="ignore")
-        match = re.search(r'og:image"\s+content="([^"]+)"', html)
-        if match:
-            img_url = match.group(1)
-            # Skip the default site favicon/logo
-            if "FAV.png" in img_url or "cropped-FAV" in img_url:
-                return None
-            return img_url
-    except Exception as e:
-        print(f"  ERROR: {e}", file=sys.stderr)
+    for attempt in range(3):
+        try:
+            req = urllib.request.Request(url, headers={
+                "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
+                "Accept": "text/html",
+            })
+            with urllib.request.urlopen(req, timeout=15) as resp:
+                final_url = resp.url
+                if "vadospeedwaypark.com" not in final_url:
+                    return None
+                html = resp.read().decode("utf-8", errors="ignore")
+            match = re.search(r'og:image"\s+content="([^"]+)"', html)
+            if match:
+                img_url = match.group(1)
+                if "FAV.png" in img_url or "cropped-FAV" in img_url:
+                    return None
+                return img_url
+            return None
+        except urllib.error.HTTPError as e:
+            if e.code in (429, 502, 503) and attempt < 2:
+                time.sleep(3 * (attempt + 1))
+                continue
+            return None
+        except Exception as e:
+            if attempt < 2:
+                time.sleep(2)
+                continue
+            return None
     return None
 
 def url_to_local_path(image_url):
@@ -164,8 +175,8 @@ def main():
         slug = item["wp_slug"]
         sanity_id = item["sanity_id"]
 
-        if i % 50 == 0 or i <= 5:
-            print(f"\n[{i}/{total}] Scraping {slug}...")
+        if i % 25 == 0 or i <= 3:
+            print(f"\n[{i}/{total}] Scraping {slug}...", flush=True)
 
         og_url = scrape_og_image(slug)
         scraped += 1
@@ -202,9 +213,11 @@ def main():
         else:
             errors += 1
 
-        # Rate limit
-        if i % 10 == 0:
-            time.sleep(0.5)
+        # Rate limit - be polite to WP server
+        time.sleep(0.3)
+        if i % 20 == 0:
+            time.sleep(2)
+            sys.stdout.flush()
 
     print(f"\n=== SUMMARY ===")
     print(f"Posts scraped: {scraped}/{total}")
