@@ -282,7 +282,8 @@ export default function PointsPage() {
         {/* Hero */}
         <Box sx={{
           textAlign: 'center',
-          py: { xs: 4, md: 6 },
+          pt: { xs: 12, md: 16 },
+          pb: { xs: 4, md: 6 },
           px: 2,
           background: 'linear-gradient(180deg, #ffffff 0%, #f5f5f7 100%)'
         }}>
@@ -295,7 +296,7 @@ export default function PointsPage() {
         </Box>
 
         {/* Filters */}
-        <Box sx={{ bgcolor: 'background.paper', py: 2, borderBottom: '1px solid #d2d2d7', position: 'sticky', top: '80px', zIndex: 100 }}>
+        <Box sx={{ bgcolor: 'background.paper', py: 2, borderBottom: '1px solid #d2d2d7', position: 'sticky', top: { xs: '56px', md: '92px' }, zIndex: 100 }}>
           <Container maxWidth={false} sx={{ px: { xs: 1, sm: 2 }, width: { xs: '100%', sm: '100%', md: '80%' }, mx: 'auto' }}>
             <Stack spacing={2}>
               <Box sx={{ display: 'flex', gap: 1 }}>
