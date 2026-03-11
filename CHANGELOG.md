@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2026-03-11] - Nav Logo Size + Points & Results Fixes
+
+### UI
+- **Nav logo enlarged:** Increased StickyNav logo from 40px/48px to 56px/64px (mobile/desktop)
+
+---
+
 ## [2026-03-11] - Fix Points & Results Year Default + Coming Soon
 
 ### Bug Fixes

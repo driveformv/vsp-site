@@ -75,7 +75,7 @@ export default function StickyNav({
             <img
               src={vspLogoDataUrl}
               alt="Vado Speedway Park"
-              className="h-10 w-auto md:h-12"
+              className="h-14 w-auto md:h-16"
             />
           </Link>
 
