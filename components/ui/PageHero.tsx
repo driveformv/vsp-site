@@ -16,7 +16,7 @@ export function PageHero({
   children,
 }: PageHeroProps) {
   return (
-    <section className="relative w-full overflow-hidden bg-black" style={{ minHeight: '85vh' }}>
+    <section className="relative w-full overflow-hidden bg-black" style={{ minHeight: '60vh' }}>
       {/* Background media */}
       {videoUrl && (
         <video
@@ -40,16 +40,16 @@ export function PageHero({
       <div className="absolute inset-0 bg-black/50" />
 
       {/* Content */}
-      <div className="relative z-10 mx-auto flex h-full min-h-[85vh] max-w-[1280px] flex-col items-center justify-center px-6 text-center">
+      <div className="relative z-10 mx-auto flex h-full min-h-[60vh] max-w-[1280px] flex-col items-center justify-center px-6 text-center md:min-h-[85vh]">
         <h1
-          className="text-5xl font-bold uppercase tracking-tight text-white md:text-6xl lg:text-7xl"
+          className="text-3xl font-bold uppercase tracking-tight text-white md:text-6xl lg:text-7xl"
           style={{ fontFamily: 'var(--font-display)' }}
         >
           {title}
         </h1>
         {subtitle && (
           <p
-            className="mt-6 text-lg font-medium uppercase tracking-wide text-white/90 md:text-xl lg:text-2xl"
+            className="mt-6 text-base font-medium uppercase tracking-wide text-white/90 md:text-xl lg:text-2xl"
             style={{ fontFamily: 'var(--font-display)' }}
           >
             {subtitle}

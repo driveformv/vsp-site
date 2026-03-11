@@ -35,7 +35,7 @@ import { ThemeProvider, createTheme } from '@mui/material/styles';
 
 const theme = createTheme({
   palette: {
-    primary: { main: '#000000' },
+    primary: { main: '#E02B20' }, // var(--color-accent)
     secondary: { main: '#86868b' },
     background: { default: '#f5f5f7', paper: '#ffffff' },
     text: { primary: '#1d1d1f', secondary: '#86868b' },
@@ -44,19 +44,22 @@ const theme = createTheme({
     error: { main: '#cd7f32' },
   },
   typography: {
-    fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif',
+    fontFamily: 'var(--font-body), Inter, sans-serif',
     h1: {
-      fontSize: '48px',
-      fontWeight: 600,
-      letterSpacing: '-0.003em',
-      lineHeight: 1.08349,
-      '@media (max-width:768px)': { fontSize: '32px' },
+      fontFamily: 'var(--font-display), Orbitron, sans-serif',
+      fontSize: '2.25rem',
+      fontWeight: 700,
+      letterSpacing: '-0.02em',
+      textTransform: 'uppercase',
+      '@media (min-width:600px)': { fontSize: '3.5rem' },
     },
     h2: {
-      fontSize: '32px',
-      fontWeight: 600,
+      fontFamily: 'var(--font-display), Orbitron, sans-serif',
+      fontSize: '1.75rem',
+      fontWeight: 700,
       letterSpacing: '-0.02em',
-      '@media (max-width:768px)': { fontSize: '24px' },
+      textTransform: 'uppercase',
+      '@media (min-width:600px)': { fontSize: '2.5rem' },
     },
     subtitle1: {
       fontSize: '21px',
@@ -290,7 +293,7 @@ export default function PointsPage() {
         </Box>
 
         {/* Filters */}
-        <Box sx={{ bgcolor: 'background.paper', py: 2, borderBottom: '1px solid #d2d2d7', position: 'sticky', top: '64px', zIndex: 100 }}>
+        <Box sx={{ bgcolor: 'background.paper', py: 2, borderBottom: '1px solid #d2d2d7', position: 'sticky', top: '80px', zIndex: 100 }}>
           <Container maxWidth={false} sx={{ px: { xs: 1, sm: 2 }, width: { xs: '100%', sm: '100%', md: '80%' }, mx: 'auto' }}>
             <Stack spacing={2}>
               <Box sx={{ display: 'flex', gap: 1 }}>

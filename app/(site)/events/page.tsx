@@ -25,7 +25,7 @@ function mapEvent(e: SanityEvent) {
     gateTime: e.gateTime,
     raceTime: e.raceTime,
     ticketLink: e.ticketLink,
-    image: e.image ? urlFor(e.image).width(640).height(480).url() : undefined,
+    image: e.image ? urlFor(e.image).width(800).height(500).url() : undefined,
     slug: e.slug.current,
   };
 }
@@ -37,11 +37,21 @@ export default async function EventsPage() {
   ]);
 
   const upcomingEvents = (upcoming || []).map(mapEvent);
-  const pastEvents = (past || []).slice(0, 12).map(mapEvent);
+  const pastEvents = (past || []).map(mapEvent);
+
+  const featuredEvent = upcomingEvents[0];
+  const remainingEvents = upcomingEvents.slice(1);
+
+  // Show first 20 past events, rest behind "load more" (client-side)
+  const visiblePast = pastEvents.slice(0, 20);
+  const totalPast = pastEvents.length;
 
   return (
     <>
-      <PageHero title="Schedule" subtitle="All upcoming and past events at Vado Speedway Park" />
+      <PageHero
+        title="Schedule"
+        subtitle="Race Calendar and Event Listings"
+      />
 
       <BreadcrumbBar
         items={[
@@ -50,47 +60,78 @@ export default async function EventsPage() {
         ]}
       />
 
-      {/* Upcoming Events */}
-      <SectionBlock variant="grey">
-        <h2
-          className="mb-8 text-2xl font-bold uppercase tracking-tight text-[var(--color-text)] md:text-3xl"
-          style={{ fontFamily: 'var(--font-display)' }}
-        >
-          Upcoming Events
-        </h2>
-        {upcomingEvents.length > 0 ? (
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {upcomingEvents.map((event) => (
-              <EventCard key={event.slug} {...event} />
+      {/* Featured Next Event */}
+      {featuredEvent && (
+        <SectionBlock variant="white">
+          <EventCard {...featuredEvent} variant="featured" />
+        </SectionBlock>
+      )}
+
+      {/* Upcoming Events - Timeline */}
+      {remainingEvents.length > 0 && (
+        <SectionBlock variant="grey">
+          <div className="mb-6 flex items-baseline justify-between">
+            <h2
+              className="section-title-accent text-lg font-bold uppercase tracking-tight text-[var(--color-text)] md:text-xl"
+              style={{ fontFamily: 'var(--font-display)' }}
+            >
+              Upcoming Events
+            </h2>
+            <span className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">
+              {remainingEvents.length} {remainingEvents.length === 1 ? 'event' : 'events'}
+            </span>
+          </div>
+          <div>
+            {remainingEvents.map((event) => (
+              <EventCard key={event.slug} {...event} variant="default" />
             ))}
           </div>
-        ) : (
-          <p className="text-sm text-[var(--color-text-muted)]">
-            No upcoming events scheduled. Check back soon.
-          </p>
-        )}
-      </SectionBlock>
+        </SectionBlock>
+      )}
+
+      {/* No Upcoming Events Fallback */}
+      {upcomingEvents.length === 0 && (
+        <SectionBlock variant="grey">
+          <div className="py-12 text-center">
+            <p
+              className="text-lg font-bold uppercase tracking-tight text-[var(--color-text-muted)]"
+              style={{ fontFamily: 'var(--font-display)' }}
+            >
+              No upcoming events scheduled
+            </p>
+            <p className="mt-2 text-sm text-[var(--color-text-muted)]">
+              Check back soon for the latest race schedule.
+            </p>
+          </div>
+        </SectionBlock>
+      )}
 
       {/* Past Events */}
-      <SectionBlock variant="white">
-        <h2
-          className="mb-8 text-2xl font-bold uppercase tracking-tight text-[var(--color-text)] md:text-3xl"
-          style={{ fontFamily: 'var(--font-display)' }}
-        >
-          Past Events
-        </h2>
-        {pastEvents.length > 0 ? (
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {pastEvents.map((event) => (
-              <EventCard key={event.slug} {...event} />
+      {visiblePast.length > 0 && (
+        <SectionBlock variant="white">
+          <div className="mb-6 flex items-baseline justify-between">
+            <h2
+              className="section-title-accent text-lg font-bold uppercase tracking-tight text-[var(--color-text)] md:text-xl"
+              style={{ fontFamily: 'var(--font-display)' }}
+            >
+              Past Events
+            </h2>
+            <span className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">
+              {totalPast} {totalPast === 1 ? 'event' : 'events'}
+            </span>
+          </div>
+          <div>
+            {visiblePast.map((event) => (
+              <EventCard key={event.slug} {...event} variant="compact" />
             ))}
           </div>
-        ) : (
-          <p className="text-sm text-[var(--color-text-muted)]">
-            No past events to show.
-          </p>
-        )}
-      </SectionBlock>
+          {totalPast > 20 && (
+            <p className="mt-6 text-center text-xs text-[var(--color-text-muted)]">
+              Showing 20 of {totalPast} past events. Visit individual event pages for details.
+            </p>
+          )}
+        </SectionBlock>
+      )}
     </>
   );
 }
