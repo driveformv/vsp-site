@@ -103,6 +103,11 @@ const classNameMappings: { [key: string]: string } = {
   'B Modifieds': 'X-Mods'
 };
 
+function formatPointsDate(dateStr: string): string {
+  const [year, month, day] = dateStr.split('-').map(Number);
+  return `${month}/${day}/${year}`;
+}
+
 export default function PointsPage() {
   const [pointsData, setPointsData] = useState<ClassPoints[]>([]);
   const [filteredData, setFilteredData] = useState<ClassPoints[]>([]);
@@ -371,7 +376,7 @@ export default function PointsPage() {
                     {classData.points_data.length} drivers competing
                     {classData.points_as_of && (
                       <Typography component="span" sx={{ ml: 2, fontStyle: 'italic', color: '#86868b' }}>
-                        As of {new Date(classData.points_as_of + 'T00:00:00').toLocaleDateString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric', timeZone: 'America/Denver' })}
+                        As of {formatPointsDate(classData.points_as_of)}
                       </Typography>
                     )}
                   </Typography>

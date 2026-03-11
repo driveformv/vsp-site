@@ -109,6 +109,15 @@ interface Event {
   };
 }
 
+const WEEKDAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+function formatEventDate(dateStr: string): string {
+  const [year, month, day] = dateStr.split('-').map(Number);
+  const d = new Date(year, month - 1, day);
+  return `${WEEKDAYS[d.getDay()]}, ${MONTHS[d.getMonth()]} ${day}, ${year}`;
+}
+
 export default function ResultsPage() {
   const [eventsData, setEventsData] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
@@ -398,7 +407,7 @@ export default function ResultsPage() {
                   <CardContent>
                     <Box sx={{ mb: 3 }}>
                       <Typography variant="body2" sx={{ color: '#000000', fontWeight: 500 }} gutterBottom>
-                        {new Date(event.event_date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                        {formatEventDate(event.event_date)}
                       </Typography>
                       <Typography variant="h2" sx={{ color: '#000000', fontWeight: 700 }}>
                         {event.event_name}
