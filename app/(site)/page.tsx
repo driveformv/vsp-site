@@ -85,6 +85,7 @@ export default async function HomePage() {
         title="Vado Speedway Park"
         videoUrl="/hero-video.mp4"
         backgroundImage="/hero-bg.jpg"
+        fullHeight
       >
         <div className="flex flex-col items-center gap-6">
           <p
