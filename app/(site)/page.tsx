@@ -91,7 +91,7 @@ export default async function HomePage() {
       <PageHero
         title="Vado Speedway Park"
         videoUrl="/hero-video.mp4"
-        backgroundImage="https://cdn.sanity.io/images/jsftjck0/production/aaf7ff381cbd0cd3df830ba6886f0d5afee7a18e-1280x853.jpg"
+        backgroundImage="/hero-bg.jpg"
       >
         <div className="flex flex-col items-center gap-6">
           <p
@@ -246,7 +246,7 @@ export default async function HomePage() {
       <section className="relative overflow-hidden">
         <div
           className="absolute inset-0 h-full w-full bg-cover bg-center"
-          style={{ backgroundImage: 'url(https://cdn.sanity.io/images/jsftjck0/production/a877c904bd1a7af90e1060c40fd16d588ec629cb-1536x1024.jpg)' }}
+          style={{ backgroundImage: 'url(/signup-bg.jpg)' }}
         />
         <div className="absolute inset-0 bg-black/60" />
         <div className="relative z-10 mx-auto max-w-[1280px] px-6 py-20">
