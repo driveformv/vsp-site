@@ -1,27 +1,12 @@
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { PortableText, type PortableTextBlock } from '@portabletext/react';
+import { PortableText } from '@portabletext/react';
 import { sanityFetch } from '@/sanity/lib/fetch';
 import { eventBySlugQuery, eventSlugsQuery } from '@/sanity/lib/queries';
 import { urlFor } from '@/sanity/lib/image';
-import { PageHero, SectionBlock, BreadcrumbBar } from '@/components/ui';
+import { PageHero, SectionBlock, BreadcrumbBar, StickyMobileCTA } from '@/components/ui';
 import { SportsEventJsonLd, BreadcrumbJsonLd } from '@/components/seo/JsonLd';
-
-interface SanityEvent {
-  _id: string;
-  title: string;
-  slug: { current: string };
-  date: string;
-  gateTime?: string;
-  raceTime?: string;
-  raceClasses?: { sponsorName?: string; className: string }[];
-  image?: { asset: { _ref: string } };
-  ticketLink?: string;
-  streamLink?: string;
-  admissionInfo?: string;
-  eventType?: string;
-  weatherStatus?: string;
-  description?: PortableTextBlock[];
-}
+import type { SanityEvent } from '@/types/sanity';
 
 export async function generateMetadata({
   params,
@@ -64,6 +49,99 @@ export async function generateStaticParams() {
 
 export const dynamicParams = true;
 
+function StatusCTABar({ event, formattedDate }: { event: SanityEvent; formattedDate: string }) {
+  const status = event.status || 'scheduled';
+
+  if (status === 'cancelled') {
+    return (
+      <div className="bg-[var(--color-accent)]">
+        <div className="mx-auto flex max-w-[1280px] items-center justify-center px-6 py-4">
+          <p
+            className="text-sm font-bold uppercase tracking-wider text-white"
+            style={{ fontFamily: 'var(--font-display)' }}
+          >
+            This event has been cancelled
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (status === 'postponed') {
+    return (
+      <div className="bg-[var(--color-accent-secondary)]">
+        <div className="mx-auto flex max-w-[1280px] items-center justify-center px-6 py-4">
+          <p
+            className="text-sm font-bold uppercase tracking-wider text-black"
+            style={{ fontFamily: 'var(--font-display)' }}
+          >
+            This event has been postponed -- check back for updates
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (status === 'completed') {
+    return (
+      <div className="bg-[var(--color-surface-alt)]">
+        <div className="mx-auto flex max-w-[1280px] items-center justify-between px-6 py-4">
+          <p className="text-sm text-[var(--color-text-muted)]">
+            This event has concluded
+            {event.recapNote ? ` -- ${event.recapNote}` : ''}
+          </p>
+          <Link
+            href="/results"
+            className="text-sm font-medium text-[var(--color-text)] underline underline-offset-2 transition-colors hover:text-[var(--color-accent)]"
+          >
+            View Results
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  // Upcoming / scheduled / soldOut -- show date + ticket CTA
+  return (
+    <div className="bg-[var(--color-accent)]">
+      <div className="mx-auto flex max-w-[1280px] items-center justify-between px-6 py-4">
+        <div className="flex items-center gap-4">
+          <p
+            className="text-sm font-bold uppercase tracking-wider text-white"
+            style={{ fontFamily: 'var(--font-display)' }}
+          >
+            {formattedDate}
+          </p>
+          {event.raceTime && (
+            <span className="text-sm text-white/80">
+              Racing at {event.raceTime}
+            </span>
+          )}
+        </div>
+        {event.ticketLink && status !== 'soldOut' && (
+          <a
+            href={event.ticketLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hidden rounded bg-white px-5 py-2 text-sm font-bold uppercase tracking-wider text-[var(--color-accent)] transition-colors hover:bg-white/90 md:inline-flex"
+            style={{ fontFamily: 'var(--font-display)' }}
+          >
+            Buy Tickets
+          </a>
+        )}
+        {status === 'soldOut' && (
+          <span
+            className="text-sm font-bold uppercase tracking-wider text-white/80"
+            style={{ fontFamily: 'var(--font-display)' }}
+          >
+            Sold Out
+          </span>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default async function EventDetailPage({
   params,
 }: {
@@ -87,6 +165,9 @@ export default async function EventDetailPage({
 
   const classes = (event.raceClasses || []).map((c) => c.className);
   const heroImage = event.image ? urlFor(event.image).width(1280).height(600).url() : undefined;
+  const status = event.status || 'scheduled';
+  const isFutureEvent = new Date(event.date) >= new Date(new Date().toDateString());
+  const showMobileCTA = isFutureEvent && !!event.ticketLink && status !== 'completed' && status !== 'cancelled' && status !== 'soldOut';
 
   return (
     <>
@@ -114,34 +195,81 @@ export default async function EventDetailPage({
         ]}
       />
 
+      {/* Status-aware CTA bar */}
+      <StatusCTABar event={event} formattedDate={formattedDate} />
+
       <SectionBlock variant="white">
         <div className="grid gap-12 lg:grid-cols-3">
           {/* Main Content */}
-          <div className="lg:col-span-2">
-            <h2
-              className="mb-4 text-xl font-bold uppercase tracking-tight text-[var(--color-text)]"
-              style={{ fontFamily: 'var(--font-display)' }}
-            >
-              Event Details
-            </h2>
-            {event.description ? (
-              <div className="prose prose-sm max-w-none text-[var(--color-text-muted)]">
-                <PortableText value={event.description} />
+          <div className="lg:col-span-2 space-y-10">
+            {/* Schedule & Admission -- primary info users look for */}
+            <div className="grid gap-6 sm:grid-cols-2">
+              <div className="rounded-lg border border-[var(--color-border)] p-6">
+                <h2
+                  className="mb-4 text-sm font-bold uppercase tracking-wider text-[var(--color-text)]"
+                  style={{ fontFamily: 'var(--font-display)' }}
+                >
+                  Schedule
+                </h2>
+                <dl className="space-y-3 text-sm">
+                  <div className="flex justify-between">
+                    <dt className="text-[var(--color-text-muted)]">Date</dt>
+                    <dd
+                      className="font-medium text-[var(--color-text)]"
+                      style={{ fontFamily: 'var(--font-mono)' }}
+                    >
+                      {formattedDate}
+                    </dd>
+                  </div>
+                  {event.gateTime && (
+                    <div className="flex justify-between">
+                      <dt className="text-[var(--color-text-muted)]">Gates Open</dt>
+                      <dd
+                        className="font-medium text-[var(--color-text)]"
+                        style={{ fontFamily: 'var(--font-mono)' }}
+                      >
+                        {event.gateTime}
+                      </dd>
+                    </div>
+                  )}
+                  {event.raceTime && (
+                    <div className="flex justify-between">
+                      <dt className="text-[var(--color-text-muted)]">Racing Starts</dt>
+                      <dd
+                        className="font-medium text-[var(--color-text)]"
+                        style={{ fontFamily: 'var(--font-mono)' }}
+                      >
+                        {event.raceTime}
+                      </dd>
+                    </div>
+                  )}
+                </dl>
               </div>
-            ) : (
-              <p className="leading-relaxed text-[var(--color-text-muted)]">
-                Event details coming soon.
-              </p>
-            )}
 
+              {event.admissionInfo && (
+                <div className="rounded-lg border border-[var(--color-border)] p-6">
+                  <h2
+                    className="mb-4 text-sm font-bold uppercase tracking-wider text-[var(--color-text)]"
+                    style={{ fontFamily: 'var(--font-display)' }}
+                  >
+                    Admission
+                  </h2>
+                  <p className="whitespace-pre-line text-sm leading-relaxed text-[var(--color-text-muted)]">
+                    {event.admissionInfo}
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* Racing Divisions */}
             {classes.length > 0 && (
-              <div className="mt-8">
-                <h3
+              <div>
+                <h2
                   className="mb-3 text-sm font-bold uppercase tracking-wider text-[var(--color-text)]"
                   style={{ fontFamily: 'var(--font-display)' }}
                 >
                   Racing Divisions
-                </h3>
+                </h2>
                 <div className="flex flex-wrap gap-2">
                   {classes.map((cls) => (
                     <span
@@ -154,54 +282,78 @@ export default async function EventDetailPage({
                 </div>
               </div>
             )}
-          </div>
 
-          {/* Sidebar */}
-          <aside className="space-y-6">
-            {/* Schedule Card */}
-            <div className="rounded-lg border border-[var(--color-border)] p-5">
-              <h3
-                className="mb-4 text-sm font-bold uppercase tracking-wider text-[var(--color-text)]"
-                style={{ fontFamily: 'var(--font-display)' }}
-              >
-                Schedule
-              </h3>
-              <dl className="space-y-3 text-sm">
-                <div className="flex justify-between">
-                  <dt className="text-[var(--color-text-muted)]">Date</dt>
-                  <dd className="font-medium text-[var(--color-text)]">{formattedDate}</dd>
-                </div>
-                {event.gateTime && (
-                  <div className="flex justify-between">
-                    <dt className="text-[var(--color-text-muted)]">Gates Open</dt>
-                    <dd className="font-medium text-[var(--color-text)]">{event.gateTime}</dd>
-                  </div>
-                )}
-                {event.raceTime && (
-                  <div className="flex justify-between">
-                    <dt className="text-[var(--color-text-muted)]">Racing Starts</dt>
-                    <dd className="font-medium text-[var(--color-text)]">{event.raceTime}</dd>
-                  </div>
-                )}
-              </dl>
-            </div>
-
-            {/* Admission Card */}
-            {event.admissionInfo && (
-              <div className="rounded-lg border border-[var(--color-border)] p-5">
-                <h3
+            {/* Description */}
+            {event.description ? (
+              <div>
+                <h2
                   className="mb-4 text-sm font-bold uppercase tracking-wider text-[var(--color-text)]"
                   style={{ fontFamily: 'var(--font-display)' }}
                 >
-                  Admission
-                </h3>
-                <p className="whitespace-pre-line text-sm text-[var(--color-text-muted)]">
-                  {event.admissionInfo}
+                  Event Details
+                </h2>
+                <div className="prose prose-sm max-w-none text-[var(--color-text-muted)]">
+                  <PortableText value={event.description} />
+                </div>
+              </div>
+            ) : (
+              <div>
+                <h2
+                  className="mb-4 text-sm font-bold uppercase tracking-wider text-[var(--color-text)]"
+                  style={{ fontFamily: 'var(--font-display)' }}
+                >
+                  Event Details
+                </h2>
+                <p className="leading-relaxed text-[var(--color-text-muted)]">
+                  Event details coming soon.
                 </p>
               </div>
             )}
 
-            {/* Weather Status */}
+            {/* Completed event: results link */}
+            {status === 'completed' && (
+              <div className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-6">
+                <h2
+                  className="mb-3 text-sm font-bold uppercase tracking-wider text-[var(--color-text)]"
+                  style={{ fontFamily: 'var(--font-display)' }}
+                >
+                  Results
+                </h2>
+                {event.recapNote ? (
+                  <p className="text-sm text-[var(--color-text-muted)]">
+                    {event.recapNote}
+                  </p>
+                ) : (
+                  <p className="text-sm text-[var(--color-text-muted)]">
+                    Results available on the results page.
+                  </p>
+                )}
+                <Link
+                  href="/results"
+                  className="mt-3 inline-flex text-sm font-medium text-[var(--color-accent)] underline underline-offset-2 transition-colors hover:text-red-700"
+                >
+                  View Full Results
+                </Link>
+              </div>
+            )}
+
+            {/* First-timer cross-link */}
+            <div className="rounded-lg border border-[var(--color-border)] p-6">
+              <p className="text-sm text-[var(--color-text-muted)]">
+                First time at Vado Speedway Park?{' '}
+                <Link
+                  href="/plan-your-visit"
+                  className="font-medium text-[var(--color-text)] underline underline-offset-2 transition-colors hover:text-[var(--color-accent)]"
+                >
+                  Plan your visit
+                </Link>
+              </p>
+            </div>
+          </div>
+
+          {/* Sidebar */}
+          <aside className="space-y-6">
+            {/* Weather Advisory */}
             {event.weatherStatus && event.weatherStatus !== 'normal' && (
               <div className="rounded-lg border-2 border-[var(--color-accent-secondary)] bg-yellow-50 p-5">
                 <h3
@@ -212,7 +364,7 @@ export default async function EventDetailPage({
                 </h3>
                 <p className="text-sm font-medium text-[var(--color-text)]">
                   {event.weatherStatus === 'delayed' && 'This event has been delayed. Check back for updates.'}
-                  {event.weatherStatus === 'cancelled' && 'This event has been cancelled.'}
+                  {event.weatherStatus === 'cancelled' && 'This event has been cancelled due to weather.'}
                   {event.weatherStatus === 'tbd' && 'Event status is to be determined. Check back for updates.'}
                 </p>
               </div>
@@ -220,17 +372,6 @@ export default async function EventDetailPage({
 
             {/* Actions */}
             <div className="space-y-3">
-              {event.ticketLink && (
-                <a
-                  href={event.ticketLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex w-full items-center justify-center rounded bg-[var(--color-accent)] px-4 py-3 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:bg-red-700"
-                  style={{ fontFamily: 'var(--font-display)' }}
-                >
-                  Buy Tickets
-                </a>
-              )}
               {event.streamLink && (
                 <a
                   href={event.streamLink}
@@ -242,22 +383,26 @@ export default async function EventDetailPage({
                   Watch Live
                 </a>
               )}
+              {event.ticketLink && status !== 'completed' && status !== 'cancelled' && status !== 'soldOut' && (
+                <a
+                  href={event.ticketLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hidden w-full items-center justify-center rounded bg-[var(--color-accent)] px-4 py-3 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:bg-red-700 md:flex"
+                  style={{ fontFamily: 'var(--font-display)' }}
+                >
+                  Buy Tickets
+                </a>
+              )}
             </div>
           </aside>
         </div>
       </SectionBlock>
 
-      <SectionBlock variant="grey">
-        <h2
-          className="mb-4 text-xl font-bold uppercase tracking-tight text-[var(--color-text)]"
-          style={{ fontFamily: 'var(--font-display)' }}
-        >
-          Results &amp; Photos
-        </h2>
-        <p className="text-sm text-[var(--color-text-muted)]">
-          Results and photos will be posted after the event.
-        </p>
-      </SectionBlock>
+      {/* Mobile Sticky CTA */}
+      {showMobileCTA && event.ticketLink && (
+        <StickyMobileCTA ticketLink={event.ticketLink} />
+      )}
     </>
   );
 }

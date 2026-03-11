@@ -11,3 +11,5 @@ export { FilterBar } from './FilterBar';
 export { StatusBanner } from './StatusBanner';
 export { BreadcrumbBar } from './BreadcrumbBar';
 export { NewsListItem } from './NewsListItem';
+export { StickyMobileCTA } from './StickyMobileCTA';
+export { CountdownTimer } from './CountdownTimer';

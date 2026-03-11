@@ -1,21 +1,14 @@
 import { sanityFetch } from '@/sanity/lib/fetch';
-import { upcomingEventsQuery, pastEventsQuery } from '@/sanity/lib/queries';
+import {
+  upcomingEventsQuery,
+  pastEventsQuery,
+  featuredUpcomingEventQuery,
+} from '@/sanity/lib/queries';
 import { urlFor } from '@/sanity/lib/image';
-import { PageHero, SectionBlock, EventCard, BreadcrumbBar } from '@/components/ui';
-
-interface SanityEvent {
-  _id: string;
-  title: string;
-  slug: { current: string };
-  date: string;
-  gateTime?: string;
-  raceTime?: string;
-  raceClasses?: { sponsorName?: string; className: string }[];
-  image?: { asset: { _ref: string } };
-  ticketLink?: string;
-  eventType?: string;
-  weatherStatus?: string;
-}
+import { PageHero, SectionBlock, BreadcrumbBar } from '@/components/ui';
+import { CountdownTimer } from '@/components/ui/CountdownTimer';
+import { EventsClient } from './EventsClient';
+import type { SanityEvent } from '@/types/sanity';
 
 function mapEvent(e: SanityEvent) {
   return {
@@ -27,24 +20,38 @@ function mapEvent(e: SanityEvent) {
     ticketLink: e.ticketLink,
     image: e.image ? urlFor(e.image).width(800).height(500).url() : undefined,
     slug: e.slug.current,
+    eventType: e.eventType,
+    status: e.status,
+    recapNote: e.recapNote,
   };
 }
 
+function formatHeroDate(dateStr: string) {
+  const d = new Date(dateStr);
+  const weekday = d.toLocaleString('en-US', { weekday: 'long' }).toUpperCase();
+  const month = d.toLocaleString('en-US', { month: 'long' }).toUpperCase();
+  const day = d.getDate();
+  const year = d.getFullYear();
+  return { weekday, month, day, year };
+}
+
 export default async function EventsPage() {
-  const [upcoming, past] = await Promise.all([
+  const [upcoming, past, featured] = await Promise.all([
     sanityFetch<SanityEvent[]>({ query: upcomingEventsQuery, tags: ['event'] }),
     sanityFetch<SanityEvent[]>({ query: pastEventsQuery, tags: ['event'] }),
+    sanityFetch<SanityEvent | null>({ query: featuredUpcomingEventQuery, tags: ['event'] }),
   ]);
 
   const upcomingEvents = (upcoming || []).map(mapEvent);
   const pastEvents = (past || []).map(mapEvent);
 
-  const featuredEvent = upcomingEvents[0];
-  const remainingEvents = upcomingEvents.slice(1);
-
-  // Show first 20 past events, rest behind "load more" (client-side)
-  const visiblePast = pastEvents.slice(0, 20);
-  const totalPast = pastEvents.length;
+  // Featured event: prefer isFeatured, fallback to first upcoming
+  const featuredRaw = featured || (upcoming && upcoming.length > 0 ? upcoming[0] : null);
+  const heroEvent = featuredRaw ? mapEvent(featuredRaw) : null;
+  const heroDate = heroEvent ? formatHeroDate(heroEvent.date) : null;
+  const timeDisplay = heroEvent
+    ? heroEvent.raceTime || heroEvent.gateTime
+    : null;
 
   return (
     <>
@@ -60,78 +67,111 @@ export default async function EventsPage() {
         ]}
       />
 
-      {/* Featured Next Event */}
-      {featuredEvent && (
-        <SectionBlock variant="white">
-          <EventCard {...featuredEvent} variant="featured" />
-        </SectionBlock>
-      )}
+      {/* Next Race Hero */}
+      {heroEvent && heroDate && (
+        <SectionBlock variant="dark">
+          <div className="flex flex-col items-center gap-6 text-center md:gap-8">
+            {/* Countdown */}
+            <div className="flex flex-col items-center gap-2">
+              <span
+                className="text-[10px] font-semibold uppercase tracking-[0.3em] text-white/50"
+                style={{ fontFamily: 'var(--font-display)' }}
+              >
+                Next Race In
+              </span>
+              <CountdownTimer targetDate={heroEvent.date} />
+            </div>
 
-      {/* Upcoming Events - Timeline */}
-      {remainingEvents.length > 0 && (
-        <SectionBlock variant="grey">
-          <div className="mb-6 flex items-baseline justify-between">
+            {/* Date */}
+            <div className="flex flex-col items-center">
+              <span
+                className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--color-accent)]"
+                style={{ fontFamily: 'var(--font-display)' }}
+              >
+                {heroDate.weekday}
+              </span>
+              <span
+                className="text-4xl font-bold leading-none text-white md:text-6xl"
+                style={{ fontFamily: 'var(--font-display)' }}
+              >
+                {heroDate.month} {heroDate.day}
+              </span>
+              <span
+                className="mt-1 text-sm font-medium tracking-wider text-white/40"
+                style={{ fontFamily: 'var(--font-mono)' }}
+              >
+                {heroDate.year}
+              </span>
+            </div>
+
+            {/* Title */}
             <h2
-              className="section-title-accent text-lg font-bold uppercase tracking-tight text-[var(--color-text)] md:text-xl"
+              className="text-xl font-bold uppercase leading-tight tracking-tight text-white md:text-3xl"
               style={{ fontFamily: 'var(--font-display)' }}
             >
-              Upcoming Events
+              {heroEvent.title}
             </h2>
-            <span className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">
-              {remainingEvents.length} {remainingEvents.length === 1 ? 'event' : 'events'}
-            </span>
-          </div>
-          <div>
-            {remainingEvents.map((event) => (
-              <EventCard key={event.slug} {...event} variant="default" />
-            ))}
+
+            {/* Time */}
+            {timeDisplay && (
+              <div className="flex items-center gap-6 text-sm text-white/70">
+                {heroEvent.gateTime && (
+                  <span>
+                    Gates:{' '}
+                    <span className="font-semibold text-white" style={{ fontFamily: 'var(--font-mono)' }}>
+                      {heroEvent.gateTime}
+                    </span>
+                  </span>
+                )}
+                {heroEvent.raceTime && (
+                  <span>
+                    Racing:{' '}
+                    <span className="font-semibold text-white" style={{ fontFamily: 'var(--font-mono)' }}>
+                      {heroEvent.raceTime}
+                    </span>
+                  </span>
+                )}
+              </div>
+            )}
+
+            {/* CTA */}
+            {heroEvent.ticketLink && (
+              <a
+                href={heroEvent.ticketLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center rounded bg-[var(--color-accent)] px-8 py-3 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:bg-red-700"
+                style={{ fontFamily: 'var(--font-display)' }}
+              >
+                Buy Tickets
+              </a>
+            )}
           </div>
         </SectionBlock>
       )}
 
-      {/* No Upcoming Events Fallback */}
-      {upcomingEvents.length === 0 && (
-        <SectionBlock variant="grey">
+      {/* No Events Fallback */}
+      {!heroEvent && upcomingEvents.length === 0 && (
+        <SectionBlock variant="dark">
           <div className="py-12 text-center">
             <p
-              className="text-lg font-bold uppercase tracking-tight text-[var(--color-text-muted)]"
+              className="text-lg font-bold uppercase tracking-tight text-white/50"
               style={{ fontFamily: 'var(--font-display)' }}
             >
               No upcoming events scheduled
             </p>
-            <p className="mt-2 text-sm text-[var(--color-text-muted)]">
+            <p className="mt-2 text-sm text-white/30">
               Check back soon for the latest race schedule.
             </p>
           </div>
         </SectionBlock>
       )}
 
-      {/* Past Events */}
-      {visiblePast.length > 0 && (
-        <SectionBlock variant="white">
-          <div className="mb-6 flex items-baseline justify-between">
-            <h2
-              className="section-title-accent text-lg font-bold uppercase tracking-tight text-[var(--color-text)] md:text-xl"
-              style={{ fontFamily: 'var(--font-display)' }}
-            >
-              Past Events
-            </h2>
-            <span className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">
-              {totalPast} {totalPast === 1 ? 'event' : 'events'}
-            </span>
-          </div>
-          <div>
-            {visiblePast.map((event) => (
-              <EventCard key={event.slug} {...event} variant="compact" />
-            ))}
-          </div>
-          {totalPast > 20 && (
-            <p className="mt-6 text-center text-xs text-[var(--color-text-muted)]">
-              Showing 20 of {totalPast} past events. Visit individual event pages for details.
-            </p>
-          )}
-        </SectionBlock>
-      )}
+      {/* Client-side filtered listing */}
+      <EventsClient
+        upcomingEvents={upcomingEvents}
+        pastEvents={pastEvents}
+      />
     </>
   );
 }
