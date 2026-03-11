@@ -371,7 +371,7 @@ function CardEventCard({
       className={`group block flex-shrink-0 w-[280px] md:w-[300px] ${isFeatured ? 'border-l-2 border-l-[var(--color-accent)] pl-3' : ''} ${isCancelled ? 'opacity-60' : ''}`}
     >
       {/* Image */}
-      <div className="relative aspect-[4/3] overflow-hidden rounded-lg bg-[var(--color-surface-dark)]">
+      <div className="relative aspect-square overflow-hidden rounded-lg bg-[var(--color-surface-dark)]">
         {image ? (
           <img
             src={image}

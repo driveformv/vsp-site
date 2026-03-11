@@ -40,7 +40,7 @@ export function PageHero({
       <div className="absolute inset-0 bg-black/50" />
 
       {/* Content */}
-      <div className="relative z-10 mx-auto flex h-full min-h-[60vh] max-w-[1280px] flex-col items-center justify-center px-6 text-center md:min-h-[85vh]">
+      <div className="relative z-10 mx-auto flex h-full min-h-[60vh] max-w-[1280px] flex-col items-center justify-center px-6 pt-28 text-center md:min-h-[85vh] md:pt-32">
         <h1
           className="text-3xl font-bold uppercase tracking-tight text-white md:text-6xl lg:text-7xl"
           style={{ fontFamily: 'var(--font-display)' }}

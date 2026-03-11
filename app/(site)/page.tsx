@@ -51,7 +51,7 @@ export default async function HomePage() {
     gateTime: e.gateTime,
     raceTime: e.raceTime,
     ticketLink: e.ticketLink,
-    image: e.image ? urlFor(e.image).width(640).height(480).url() : undefined,
+    image: e.image ? urlFor(e.image).width(1080).height(1080).url() : undefined,
     slug: e.slug.current,
     eventType: e.eventType,
     status: e.status,

@@ -18,7 +18,7 @@ function mapEvent(e: SanityEvent) {
     gateTime: e.gateTime,
     raceTime: e.raceTime,
     ticketLink: e.ticketLink,
-    image: e.image ? urlFor(e.image).width(800).height(500).url() : undefined,
+    image: e.image ? urlFor(e.image).width(1080).height(1080).url() : undefined,
     slug: e.slug.current,
     eventType: e.eventType,
     status: e.status,
