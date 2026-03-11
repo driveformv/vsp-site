@@ -92,9 +92,19 @@ types/              -- TypeScript interfaces
 - `/api/sync-all` - MyRacePass -> Supabase cron sync (GET/POST)
 - `/api/validate-event` - AI event validation (Anthropic SDK)
 
+## Events Design (researched from NASCAR, F1, WoO, DIRTcar, Eldora, Knoxville)
+- Dark theme (#0a0a0a) for events sections — industry standard for premium motorsport
+- Single-column vertical list for schedule — NOT card grid (every racing site uses this)
+- Date badges as left anchors (month in red, day in white, weekday below)
+- Images only in hero sections, text-based rows for schedule list
+- CountdownTimer: boxed blocks (bg-white/5) with Orbitron numbers
+- Ticket CTAs: red with glow shadows, visible on all screen sizes
+- Homepage: Next Race hero with countdown + ticket CTA between PageHero and carousel
+
 ## Rules
 - No emoji anywhere in the frontend
 - Follow McKinsey/BCG consulting presentation design standards
+- Events pages follow NASCAR/F1/dirt racing dark-theme patterns (see Events Design above)
 - Always update CHANGELOG.md with changes
 - Design system tokens are in app/globals.css - never override per-page
 - Use shared components for all pages - no one-off styling

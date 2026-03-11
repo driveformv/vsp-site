@@ -123,7 +123,7 @@ function StatusCTABar({ event, formattedDate }: { event: SanityEvent; formattedD
             href={event.ticketLink}
             target="_blank"
             rel="noopener noreferrer"
-            className="hidden rounded bg-white px-5 py-2 text-sm font-bold uppercase tracking-wider text-[var(--color-accent)] transition-colors hover:bg-white/90 md:inline-flex"
+            className="inline-flex rounded bg-white px-5 py-2 text-sm font-bold uppercase tracking-wider text-[var(--color-accent)] transition-colors hover:bg-white/90"
             style={{ fontFamily: 'var(--font-display)' }}
           >
             Buy Tickets
@@ -388,7 +388,7 @@ export default async function EventDetailPage({
                   href={event.ticketLink}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hidden w-full items-center justify-center rounded bg-[var(--color-accent)] px-4 py-3 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:bg-red-700 md:flex"
+                  className="flex w-full items-center justify-center rounded bg-[var(--color-accent)] px-4 py-3 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:bg-red-700"
                   style={{ fontFamily: 'var(--font-display)' }}
                 >
                   Buy Tickets

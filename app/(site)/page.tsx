@@ -10,6 +10,7 @@ import {
   NewsListItem,
   SponsorStrip,
 } from '@/components/ui';
+import { CountdownTimer } from '@/components/ui/CountdownTimer';
 import FanProgramForm from './FanProgramForm';
 import EventsCarousel from './EventsCarousel';
 import { LocalBusinessJsonLd } from '@/components/seo/JsonLd';
@@ -122,6 +123,47 @@ export default async function HomePage() {
         </div>
       </PageHero>
 
+      {/* ── Next Race ── */}
+      {upcomingEvents.length > 0 && (
+        <section className="relative overflow-hidden bg-black">
+          {upcomingEvents[0].image && (
+            <div
+              className="absolute inset-0 bg-cover bg-center opacity-30"
+              style={{ backgroundImage: `url(${upcomingEvents[0].image})` }}
+            />
+          )}
+          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/70 to-black/50" />
+          <div className="relative z-10 mx-auto max-w-[1280px] px-6 py-20 md:py-28">
+            <div className="flex flex-col items-center gap-8 text-center">
+              <span
+                className="text-[10px] font-semibold uppercase tracking-[0.4em] text-[var(--color-accent)]"
+                style={{ fontFamily: 'var(--font-display)' }}
+              >
+                Next Race
+              </span>
+              <CountdownTimer targetDate={upcomingEvents[0].date} />
+              <h2
+                className="max-w-3xl text-3xl font-bold uppercase leading-tight tracking-tight text-white md:text-5xl"
+                style={{ fontFamily: 'var(--font-display)' }}
+              >
+                {upcomingEvents[0].title}
+              </h2>
+              {upcomingEvents[0].ticketLink && (
+                <a
+                  href={upcomingEvents[0].ticketLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="rounded bg-[var(--color-accent)] px-12 py-4 text-base font-bold uppercase tracking-wider text-white shadow-[0_0_40px_rgba(224,43,32,0.35)] transition-all hover:bg-red-700 hover:shadow-[0_0_60px_rgba(224,43,32,0.5)] md:text-lg"
+                  style={{ fontFamily: 'var(--font-display)' }}
+                >
+                  Buy Tickets
+                </a>
+              )}
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* ── Upcoming Events ── */}
       <SectionBlock variant="grey">
         <h2
@@ -130,8 +172,12 @@ export default async function HomePage() {
         >
           Upcoming Events
         </h2>
-        {upcomingEvents.length > 0 ? (
-          <EventsCarousel events={upcomingEvents} />
+        {upcomingEvents.length > 1 ? (
+          <EventsCarousel events={upcomingEvents.slice(1)} />
+        ) : upcomingEvents.length === 1 ? (
+          <p className="text-center text-sm text-[var(--color-text-muted)]">
+            More events coming soon.
+          </p>
         ) : (
           <p className="text-center text-sm text-[var(--color-text-muted)]">
             No upcoming events scheduled. Check back soon.

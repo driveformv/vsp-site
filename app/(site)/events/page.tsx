@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { sanityFetch } from '@/sanity/lib/fetch';
 import {
   upcomingEventsQuery,
@@ -5,7 +6,7 @@ import {
   featuredUpcomingEventQuery,
 } from '@/sanity/lib/queries';
 import { urlFor } from '@/sanity/lib/image';
-import { PageHero, SectionBlock, BreadcrumbBar } from '@/components/ui';
+import { PageHero, BreadcrumbBar } from '@/components/ui';
 import { CountdownTimer } from '@/components/ui/CountdownTimer';
 import { EventsClient } from './EventsClient';
 import type { SanityEvent } from '@/types/sanity';
@@ -45,13 +46,12 @@ export default async function EventsPage() {
   const upcomingEvents = (upcoming || []).map(mapEvent);
   const pastEvents = (past || []).map(mapEvent);
 
-  // Featured event: prefer isFeatured, fallback to first upcoming
   const featuredRaw = featured || (upcoming && upcoming.length > 0 ? upcoming[0] : null);
   const heroEvent = featuredRaw ? mapEvent(featuredRaw) : null;
   const heroDate = heroEvent ? formatHeroDate(heroEvent.date) : null;
-  const timeDisplay = heroEvent
-    ? heroEvent.raceTime || heroEvent.gateTime
-    : null;
+  const heroImage = heroEvent?.image
+    ? heroEvent.image.replace('1080x1080', '1920x1080')
+    : undefined;
 
   return (
     <>
@@ -67,104 +67,115 @@ export default async function EventsPage() {
         ]}
       />
 
-      {/* Next Race Hero */}
+      {/* ── Next Race Hero ── cinematic full-width with image background */}
       {heroEvent && heroDate && (
-        <SectionBlock variant="dark">
-          <div className="flex flex-col items-center gap-6 text-center md:gap-8">
-            {/* Countdown */}
-            <div className="flex flex-col items-center gap-2">
+        <section className="relative overflow-hidden bg-black">
+          {heroImage && (
+            <div
+              className="absolute inset-0 bg-cover bg-center opacity-40"
+              style={{ backgroundImage: `url(${heroImage})` }}
+            />
+          )}
+          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/70 to-black/50" />
+
+          <div className="relative z-10 mx-auto max-w-[1280px] px-6 py-20 md:py-32">
+            <div className="flex flex-col items-center gap-10 text-center">
+              {/* Label */}
               <span
-                className="text-[10px] font-semibold uppercase tracking-[0.3em] text-white/50"
+                className="text-[10px] font-semibold uppercase tracking-[0.4em] text-[var(--color-accent)]"
                 style={{ fontFamily: 'var(--font-display)' }}
               >
-                Next Race In
+                Next Race
               </span>
+
+              {/* Countdown */}
               <CountdownTimer targetDate={heroEvent.date} />
-            </div>
 
-            {/* Date */}
-            <div className="flex flex-col items-center">
-              <span
-                className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--color-accent)]"
-                style={{ fontFamily: 'var(--font-display)' }}
-              >
-                {heroDate.weekday}
-              </span>
-              <span
-                className="text-4xl font-bold leading-none text-white md:text-6xl"
-                style={{ fontFamily: 'var(--font-display)' }}
-              >
-                {heroDate.month} {heroDate.day}
-              </span>
-              <span
-                className="mt-1 text-sm font-medium tracking-wider text-white/40"
-                style={{ fontFamily: 'var(--font-mono)' }}
-              >
-                {heroDate.year}
-              </span>
-            </div>
-
-            {/* Title */}
-            <h2
-              className="text-xl font-bold uppercase leading-tight tracking-tight text-white md:text-3xl"
-              style={{ fontFamily: 'var(--font-display)' }}
-            >
-              {heroEvent.title}
-            </h2>
-
-            {/* Time */}
-            {timeDisplay && (
-              <div className="flex items-center gap-6 text-sm text-white/70">
-                {heroEvent.gateTime && (
-                  <span>
-                    Gates:{' '}
-                    <span className="font-semibold text-white" style={{ fontFamily: 'var(--font-mono)' }}>
-                      {heroEvent.gateTime}
-                    </span>
-                  </span>
-                )}
-                {heroEvent.raceTime && (
-                  <span>
-                    Racing:{' '}
-                    <span className="font-semibold text-white" style={{ fontFamily: 'var(--font-mono)' }}>
-                      {heroEvent.raceTime}
-                    </span>
-                  </span>
-                )}
+              {/* Date line */}
+              <div className="flex items-center gap-3">
+                <div className="h-px w-8 bg-white/10" />
+                <span
+                  className="text-xs font-semibold uppercase tracking-[0.2em] text-white/40"
+                  style={{ fontFamily: 'var(--font-display)' }}
+                >
+                  {heroDate.weekday} / {heroDate.month} {heroDate.day}, {heroDate.year}
+                </span>
+                <div className="h-px w-8 bg-white/10" />
               </div>
-            )}
 
-            {/* CTA */}
-            {heroEvent.ticketLink && (
-              <a
-                href={heroEvent.ticketLink}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center rounded bg-[var(--color-accent)] px-8 py-3 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:bg-red-700"
+              {/* Title */}
+              <h2
+                className="max-w-3xl text-3xl font-bold uppercase leading-tight tracking-tight text-white md:text-5xl"
                 style={{ fontFamily: 'var(--font-display)' }}
               >
-                Buy Tickets
-              </a>
-            )}
+                {heroEvent.title}
+              </h2>
+
+              {/* Time info */}
+              {(heroEvent.gateTime || heroEvent.raceTime) && (
+                <div className="flex items-center gap-6 text-sm text-white/50">
+                  {heroEvent.gateTime && (
+                    <span>
+                      Gates:{' '}
+                      <span className="font-semibold text-white/80" style={{ fontFamily: 'var(--font-mono)' }}>
+                        {heroEvent.gateTime}
+                      </span>
+                    </span>
+                  )}
+                  {heroEvent.raceTime && (
+                    <span>
+                      Racing:{' '}
+                      <span className="font-semibold text-white/80" style={{ fontFamily: 'var(--font-mono)' }}>
+                        {heroEvent.raceTime}
+                      </span>
+                    </span>
+                  )}
+                </div>
+              )}
+
+              {/* CTAs */}
+              <div className="flex flex-col items-center gap-4 sm:flex-row">
+                {heroEvent.ticketLink && (
+                  <a
+                    href={heroEvent.ticketLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full rounded bg-[var(--color-accent)] px-12 py-4 text-center text-base font-bold uppercase tracking-wider text-white shadow-[0_0_40px_rgba(224,43,32,0.35)] transition-all hover:bg-red-700 hover:shadow-[0_0_60px_rgba(224,43,32,0.5)] sm:w-auto md:text-lg"
+                    style={{ fontFamily: 'var(--font-display)' }}
+                  >
+                    Buy Tickets
+                  </a>
+                )}
+                <Link
+                  href={`/events/${heroEvent.slug}`}
+                  className="text-sm font-bold uppercase tracking-wider text-white/30 transition-colors hover:text-white/70"
+                  style={{ fontFamily: 'var(--font-display)' }}
+                >
+                  Event Details
+                </Link>
+              </div>
+            </div>
           </div>
-        </SectionBlock>
+        </section>
       )}
 
       {/* No Events Fallback */}
       {!heroEvent && upcomingEvents.length === 0 && (
-        <SectionBlock variant="dark">
-          <div className="py-12 text-center">
-            <p
-              className="text-lg font-bold uppercase tracking-tight text-white/50"
-              style={{ fontFamily: 'var(--font-display)' }}
-            >
-              No upcoming events scheduled
-            </p>
-            <p className="mt-2 text-sm text-white/30">
-              Check back soon for the latest race schedule.
-            </p>
+        <section className="bg-[#0a0a0a]">
+          <div className="mx-auto max-w-[1280px] px-6 py-16">
+            <div className="py-12 text-center">
+              <p
+                className="text-lg font-bold uppercase tracking-tight text-white/30"
+                style={{ fontFamily: 'var(--font-display)' }}
+              >
+                No upcoming events scheduled
+              </p>
+              <p className="mt-2 text-sm text-white/20">
+                Check back soon for the latest race schedule.
+              </p>
+            </div>
           </div>
-        </SectionBlock>
+        </section>
       )}
 
       {/* Client-side filtered listing */}

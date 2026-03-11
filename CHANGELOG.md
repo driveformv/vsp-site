@@ -2,6 +2,53 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2026-03-11] - Events Visual Overhaul v2 (Racing Site Research)
+
+Researched NASCAR.com, Formula1.com, World of Outlaws, DIRTcar, Eldora Speedway, Knoxville Raceway, Williams Grove — applied industry-standard motorsport design patterns.
+
+### Design Direction (based on research)
+- Dark backgrounds (#0a0a0a) for events sections — every premium racing site uses dark theme
+- Single-column vertical list for schedule (NOT card grid) — industry standard across all sites
+- Bold condensed uppercase Orbitron typography — matches Oswald/Rajdhani used by WoO/DIRTcar
+- Date badges as visual anchors on left — universal pattern across all racing sites
+- Images reserved for hero sections only, text-based rows for schedule list
+- Red accent (#E02B20) for CTAs with glow shadows — matches NASCAR/WoO ecosystem
+
+### CountdownTimer
+- Rebuilt as boxed blocks (bg-white/5 containers) with large Orbitron numbers
+- Each block: 64px/96px square with centered number + label below
+- RACE NIGHT state with decorative red accent lines flanking text
+- Colon separators between blocks
+
+### Events Listing Page
+- **Full dark theme** (#0a0a0a background) for filter bar and upcoming events section
+- Dark-themed filter tabs and month pills (white/10 active, white/5 inactive)
+- **Cinematic Next Race hero**: image bg at 40% opacity, heavy dark gradient overlay, centered layout
+- Title bumped to `text-3xl md:text-5xl`, max-width 3xl for readability
+- Buy Tickets: `px-12 py-4`, red glow `shadow-[0_0_40px_rgba(224,43,32,0.35)]`, intensifies on hover
+- Date line with decorative horizontal rules flanking text
+- Red accent gradient line above upcoming events list
+
+### EventCard — Dark Theme Default
+- DefaultEventCard completely redesigned for dark backgrounds
+- Date badge: dark box (bg-white/5) with month in red, day in white, weekday in white/30
+- White text hierarchy: title white, meta white/40, time values white/60
+- Tickets badge with red glow on group hover
+- Arrow icon white/20 -> accent red on hover
+- Border-bottom white/5 for subtle row separation
+- Hover state: bg-white/[0.03] (barely visible lift)
+- FeaturedEventCard: dark surface-dark bg, white text, dark-themed class pills
+- CardEventCard: dark gradient overlay on images, dark date badge (bg-black/80)
+
+### Homepage
+- Next Race section: image at 30% opacity (not full brightness), heavier gradient
+- Title `text-3xl md:text-5xl` (up from 2xl/4xl)
+- Ticket CTA with stronger glow shadow
+
+### Event Detail Page
+- StatusCTABar Buy Tickets: visible on all screens (removed hidden md:inline-flex)
+- Sidebar Buy Tickets: visible on all screens (removed hidden md:flex)
+
 ## [2026-03-11] - Events System Redesign (Phase 1-5)
 
 ### Schema

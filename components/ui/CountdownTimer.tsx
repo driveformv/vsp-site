@@ -22,6 +22,27 @@ function pad(n: number): string {
   return n.toString().padStart(2, '0');
 }
 
+function TimeBlock({ value, label }: { value: string; label: string }) {
+  return (
+    <div className="flex flex-col items-center">
+      <div className="flex h-16 w-16 items-center justify-center rounded bg-white/5 md:h-24 md:w-24">
+        <span
+          className="text-4xl font-bold leading-none text-white md:text-6xl"
+          style={{ fontFamily: 'var(--font-display)' }}
+        >
+          {value}
+        </span>
+      </div>
+      <span
+        className="mt-2 text-[9px] font-semibold uppercase tracking-[0.25em] text-white/40 md:text-[10px]"
+        style={{ fontFamily: 'var(--font-display)' }}
+      >
+        {label}
+      </span>
+    </div>
+  );
+}
+
 export function CountdownTimer({ targetDate }: CountdownTimerProps) {
   const [timeLeft, setTimeLeft] = useState<ReturnType<typeof calculateTimeLeft> | undefined>(undefined);
 
@@ -34,35 +55,44 @@ export function CountdownTimer({ targetDate }: CountdownTimerProps) {
     return () => clearInterval(timer);
   }, [targetDate]);
 
-  // Render nothing on server / first client paint to avoid hydration mismatch
   if (timeLeft === undefined) {
     return (
-      <span
-        className="text-lg font-bold tracking-wider text-white/40 md:text-2xl"
-        style={{ fontFamily: 'var(--font-mono)' }}
-      >
-        --d --h --m --s
-      </span>
+      <div className="flex items-start gap-2 md:gap-4">
+        <TimeBlock value="--" label="DAYS" />
+        <span className="mt-4 text-2xl font-bold text-white/20 md:mt-6 md:text-4xl" style={{ fontFamily: 'var(--font-display)' }}>:</span>
+        <TimeBlock value="--" label="HRS" />
+        <span className="mt-4 text-2xl font-bold text-white/20 md:mt-6 md:text-4xl" style={{ fontFamily: 'var(--font-display)' }}>:</span>
+        <TimeBlock value="--" label="MIN" />
+        <span className="mt-4 text-2xl font-bold text-white/20 md:mt-6 md:text-4xl" style={{ fontFamily: 'var(--font-display)' }}>:</span>
+        <TimeBlock value="--" label="SEC" />
+      </div>
     );
   }
 
   if (!timeLeft) {
     return (
-      <span
-        className="text-lg font-bold uppercase tracking-widest text-[var(--color-accent)]"
-        style={{ fontFamily: 'var(--font-display)' }}
-      >
-        RACE NIGHT
-      </span>
+      <div className="flex items-center gap-4">
+        <div className="h-px flex-1 bg-[var(--color-accent)]/30" />
+        <span
+          className="text-3xl font-bold uppercase tracking-[0.2em] text-[var(--color-accent)] md:text-5xl"
+          style={{ fontFamily: 'var(--font-display)' }}
+        >
+          RACE NIGHT
+        </span>
+        <div className="h-px flex-1 bg-[var(--color-accent)]/30" />
+      </div>
     );
   }
 
   return (
-    <span
-      className="text-lg font-bold tracking-wider text-white md:text-2xl"
-      style={{ fontFamily: 'var(--font-mono)' }}
-    >
-      {timeLeft.days}d {pad(timeLeft.hours)}h {pad(timeLeft.minutes)}m {pad(timeLeft.seconds)}s
-    </span>
+    <div className="flex items-start gap-2 md:gap-4">
+      <TimeBlock value={String(timeLeft.days)} label="DAYS" />
+      <span className="mt-4 text-2xl font-bold text-white/20 md:mt-6 md:text-4xl" style={{ fontFamily: 'var(--font-display)' }}>:</span>
+      <TimeBlock value={pad(timeLeft.hours)} label="HRS" />
+      <span className="mt-4 text-2xl font-bold text-white/20 md:mt-6 md:text-4xl" style={{ fontFamily: 'var(--font-display)' }}>:</span>
+      <TimeBlock value={pad(timeLeft.minutes)} label="MIN" />
+      <span className="mt-4 text-2xl font-bold text-white/20 md:mt-6 md:text-4xl" style={{ fontFamily: 'var(--font-display)' }}>:</span>
+      <TimeBlock value={pad(timeLeft.seconds)} label="SEC" />
+    </div>
   );
 }

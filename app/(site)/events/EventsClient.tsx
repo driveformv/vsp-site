@@ -73,10 +73,9 @@ export function EventsClient({ upcomingEvents, pastEvents }: EventsClientProps) 
 
   return (
     <>
-      {/* Filter Bar */}
-      <section className="border-b border-[var(--color-border)] bg-white">
+      {/* Filter Bar — dark themed */}
+      <section className="border-b border-white/5 bg-[#0a0a0a]">
         <div className="mx-auto max-w-[1280px] px-6 py-5">
-          {/* Event Type Tabs */}
           <div className="flex items-center gap-6">
             {typeFilters.map((f) => (
               <button
@@ -84,8 +83,8 @@ export function EventsClient({ upcomingEvents, pastEvents }: EventsClientProps) 
                 onClick={() => { setSelectedType(f.key); setPastVisible(PAST_PAGE_SIZE); }}
                 className={`border-b-2 pb-1 text-xs font-bold uppercase tracking-wider transition-colors ${
                   selectedType === f.key
-                    ? 'border-[var(--color-accent)] text-[var(--color-text)]'
-                    : 'border-transparent text-[var(--color-text-muted)] hover:text-[var(--color-text)]'
+                    ? 'border-[var(--color-accent)] text-white'
+                    : 'border-transparent text-white/40 hover:text-white/70'
                 }`}
                 style={{ fontFamily: 'var(--font-display)' }}
               >
@@ -94,15 +93,14 @@ export function EventsClient({ upcomingEvents, pastEvents }: EventsClientProps) 
             ))}
           </div>
 
-          {/* Month Picker */}
           {months.length > 0 && (
             <div className="scrollbar-hide mt-4 flex gap-2 overflow-x-auto">
               <button
                 onClick={() => { setSelectedMonth(null); setPastVisible(PAST_PAGE_SIZE); }}
                 className={`flex-shrink-0 rounded-full px-3.5 py-1.5 text-[10px] font-semibold uppercase tracking-wider transition-colors ${
                   selectedMonth === null
-                    ? 'bg-[var(--color-surface-dark)] text-white'
-                    : 'bg-[var(--color-surface-alt)] text-[var(--color-text-muted)] hover:bg-[var(--color-border)]'
+                    ? 'bg-white/10 text-white'
+                    : 'bg-white/5 text-white/30 hover:bg-white/10 hover:text-white/60'
                 }`}
                 style={{ fontFamily: 'var(--font-display)' }}
               >
@@ -114,8 +112,8 @@ export function EventsClient({ upcomingEvents, pastEvents }: EventsClientProps) 
                   onClick={() => { setSelectedMonth(m); setPastVisible(PAST_PAGE_SIZE); }}
                   className={`flex-shrink-0 rounded-full px-3.5 py-1.5 text-[10px] font-semibold uppercase tracking-wider transition-colors ${
                     selectedMonth === m
-                      ? 'bg-[var(--color-surface-dark)] text-white'
-                      : 'bg-[var(--color-surface-alt)] text-[var(--color-text-muted)] hover:bg-[var(--color-border)]'
+                      ? 'bg-white/10 text-white'
+                      : 'bg-white/5 text-white/30 hover:bg-white/10 hover:text-white/60'
                   }`}
                   style={{ fontFamily: 'var(--font-display)' }}
                 >
@@ -127,62 +125,39 @@ export function EventsClient({ upcomingEvents, pastEvents }: EventsClientProps) 
         </div>
       </section>
 
-      {/* Upcoming Events */}
-      <section className="bg-[var(--color-surface-alt)]">
+      {/* Upcoming Events — dark background, single-column list */}
+      <section className="bg-[#0a0a0a]">
         <div className="mx-auto max-w-[1280px] px-6 py-16">
-          <div className="mb-6 flex items-baseline justify-between">
+          <div className="mb-8 flex items-baseline justify-between">
             <h2
-              className="section-title-accent text-lg font-bold uppercase tracking-tight text-[var(--color-text)] md:text-xl"
+              className="text-2xl font-bold uppercase tracking-tight text-white md:text-3xl"
               style={{ fontFamily: 'var(--font-display)' }}
             >
               Upcoming Events
             </h2>
-            <span className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">
+            <span className="text-xs font-semibold uppercase tracking-wider text-white/30">
               {filteredUpcoming.length} {filteredUpcoming.length === 1 ? 'event' : 'events'}
             </span>
           </div>
 
+          {/* Red accent line */}
+          <div className="mb-6 h-px bg-gradient-to-r from-[var(--color-accent)] via-[var(--color-accent)]/40 to-transparent" />
+
           {filteredUpcoming.length > 0 ? (
             <div>
               {filteredUpcoming.map((event) => (
-                <div key={event.slug} className="relative">
-                  <EventCard {...event} variant="default" />
-                  {event.eventType === 'special' && (
-                    <span
-                      className="absolute right-0 top-1/2 -translate-y-1/2 rounded bg-[var(--color-accent)] px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest text-white md:right-4"
-                      style={{ fontFamily: 'var(--font-display)' }}
-                    >
-                      Special
-                    </span>
-                  )}
-                  {event.status && event.status !== 'scheduled' && event.status !== 'completed' && (
-                    <span
-                      className={`absolute right-12 top-1/2 -translate-y-1/2 rounded px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest md:right-20 ${
-                        event.status === 'cancelled'
-                          ? 'bg-red-100 text-red-700'
-                          : event.status === 'postponed'
-                            ? 'bg-amber-100 text-amber-700'
-                            : event.status === 'soldOut'
-                              ? 'bg-gray-100 text-gray-700'
-                              : 'bg-gray-100 text-gray-600'
-                      }`}
-                      style={{ fontFamily: 'var(--font-display)' }}
-                    >
-                      {event.status === 'soldOut' ? 'Sold Out' : event.status}
-                    </span>
-                  )}
-                </div>
+                <EventCard key={event.slug} {...event} variant="default" />
               ))}
             </div>
           ) : (
             <div className="py-12 text-center">
               <p
-                className="text-lg font-bold uppercase tracking-tight text-[var(--color-text-muted)]"
+                className="text-lg font-bold uppercase tracking-tight text-white/30"
                 style={{ fontFamily: 'var(--font-display)' }}
               >
                 No upcoming events match your filters
               </p>
-              <p className="mt-2 text-sm text-[var(--color-text-muted)]">
+              <p className="mt-2 text-sm text-white/20">
                 Try adjusting the month or event type filter.
               </p>
             </div>
@@ -190,7 +165,7 @@ export function EventsClient({ upcomingEvents, pastEvents }: EventsClientProps) 
         </div>
       </section>
 
-      {/* Past Events */}
+      {/* Past Events — light background for contrast */}
       <section className="bg-white">
         <div className="mx-auto max-w-[1280px] px-6 py-16">
           <div className="mb-6 flex items-baseline justify-between">
