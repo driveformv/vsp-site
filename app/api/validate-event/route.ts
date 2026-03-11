@@ -16,12 +16,13 @@ The actual date is ${eventDate.toDateString()} which is a ${dayName}.
 
 Event data:
 - Title: ${event.title}
-- Admission info: ${event.admissionInfo}
-- Pit Gates: ${event.pitGatesTime}
-- Front Gates: ${event.frontGatesTime}
-- Races Start: ${event.racesTime}
+- Admission info: ${event.admissionInfo || 'none'}
+- Gate Time: ${event.gateTime || 'none'}
+- Race Time: ${event.raceTime || 'none'}
 - Ticket link: ${event.ticketLink || 'none'}
-- Event type: ${event.eventType}
+- Event type: ${event.eventType || 'none'}
+- Status: ${event.status || 'none'}
+- Featured: ${event.isFeatured || false}
 - External URL: ${event.externalUrl || 'none'}
 - Race classes count: ${event.raceClasses?.length || 0}
 - Has image: ${!!event.image}

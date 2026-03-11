@@ -1,5 +1,7 @@
 import Link from 'next/link';
 
+import type { EventStatus, EventType } from '@/types/sanity';
+
 interface EventCardProps {
   title: string;
   date: string;
@@ -10,6 +12,43 @@ interface EventCardProps {
   image?: string;
   slug: string;
   variant?: 'featured' | 'default' | 'compact' | 'card';
+  eventType?: EventType;
+  status?: EventStatus;
+  isFeatured?: boolean;
+  recapNote?: string;
+}
+
+function StatusBadge({ status }: { status?: EventStatus }) {
+  if (!status || status === 'scheduled' || status === 'completed') return null;
+  const config = {
+    cancelled: { label: 'CANCELLED', bg: 'bg-[var(--color-accent)]', text: 'text-white' },
+    postponed: { label: 'POSTPONED', bg: 'bg-[var(--color-accent-secondary)]', text: 'text-[var(--color-text)]' },
+    soldOut: { label: 'SOLD OUT', bg: 'bg-[var(--color-text-muted)]', text: 'text-white' },
+  }[status];
+  if (!config) return null;
+  return (
+    <span
+      className={`rounded px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider ${config.bg} ${config.text}`}
+      style={{ fontFamily: 'var(--font-display)' }}
+    >
+      {config.label}
+    </span>
+  );
+}
+
+function EventTypeBadge({ eventType }: { eventType?: EventType }) {
+  if (!eventType || eventType === 'weekly') return null;
+  if (eventType === 'special') {
+    return (
+      <span
+        className="rounded border border-[var(--color-accent)] px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-[var(--color-accent)]"
+        style={{ fontFamily: 'var(--font-display)' }}
+      >
+        Special
+      </span>
+    );
+  }
+  return null;
 }
 
 function formatDate(dateStr: string) {
@@ -198,13 +237,16 @@ function DefaultEventCard({
   raceTime,
   ticketLink,
   slug,
+  eventType,
+  status,
 }: EventCardProps) {
   const timeDisplay = raceTime || gateTime;
+  const isCancelled = status === 'cancelled';
 
   return (
     <Link
       href={`/events/${slug}`}
-      className="group flex items-center gap-5 border-b border-[var(--color-border)] py-5 transition-colors hover:bg-[var(--color-surface-alt)] md:gap-8 md:px-4 md:py-6"
+      className={`group flex items-center gap-5 border-b border-[var(--color-border)] py-5 transition-colors hover:bg-[var(--color-surface-alt)] md:gap-8 md:px-4 md:py-6 ${isCancelled ? 'opacity-60' : ''}`}
     >
       {/* Date block */}
       <div className="w-14 flex-shrink-0 md:w-16">
@@ -216,12 +258,16 @@ function DefaultEventCard({
 
       {/* Content */}
       <div className="flex-1 min-w-0">
-        <h3
-          className="text-sm font-bold uppercase leading-snug tracking-tight text-[var(--color-text)] transition-colors group-hover:text-[var(--color-accent)] md:text-base"
-          style={{ fontFamily: 'var(--font-display)' }}
-        >
-          {title}
-        </h3>
+        <div className="flex items-center gap-2">
+          <h3
+            className={`text-sm font-bold uppercase leading-snug tracking-tight transition-colors group-hover:text-[var(--color-accent)] md:text-base ${isCancelled ? 'line-through text-[var(--color-text-muted)]' : 'text-[var(--color-text)]'}`}
+            style={{ fontFamily: 'var(--font-display)' }}
+          >
+            {title}
+          </h3>
+          <EventTypeBadge eventType={eventType} />
+          <StatusBadge status={status} />
+        </div>
         <div className="mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-[var(--color-text-muted)]">
           {timeDisplay && (
             <span>
@@ -238,7 +284,7 @@ function DefaultEventCard({
 
       {/* CTA */}
       <div className="flex flex-shrink-0 items-center gap-3">
-        {ticketLink && (
+        {ticketLink && status !== 'soldOut' && status !== 'cancelled' && (
           <span
             className="hidden rounded bg-[var(--color-accent)] px-4 py-2 text-[10px] font-bold uppercase tracking-wider text-white sm:inline-block"
             style={{ fontFamily: 'var(--font-display)' }}
@@ -255,13 +301,14 @@ function DefaultEventCard({
 }
 
 /* ── Compact Card ── minimal row for past events */
-function CompactEventCard({ title, date, classes, slug }: EventCardProps) {
+function CompactEventCard({ title, date, classes, slug, recapNote, status }: EventCardProps) {
   const { month, day, year } = formatDate(date);
+  const isCancelled = status === 'cancelled';
 
   return (
     <Link
       href={`/events/${slug}`}
-      className="group flex items-center justify-between border-b border-[var(--color-border)] py-3 transition-colors hover:bg-[var(--color-surface-alt)] md:px-4"
+      className={`group flex items-center justify-between border-b border-[var(--color-border)] py-3 transition-colors hover:bg-[var(--color-surface-alt)] md:px-4 ${isCancelled ? 'opacity-60' : ''}`}
     >
       <div className="flex items-center gap-4 min-w-0">
         <span
@@ -270,11 +317,21 @@ function CompactEventCard({ title, date, classes, slug }: EventCardProps) {
         >
           {month} {day}, {year}
         </span>
-        <span
-          className="truncate text-sm font-semibold text-[var(--color-text)] transition-colors group-hover:text-[var(--color-accent)]"
-        >
-          {title}
-        </span>
+        <div className="min-w-0">
+          <div className="flex items-center gap-2">
+            <span
+              className={`truncate text-sm font-semibold transition-colors group-hover:text-[var(--color-accent)] ${isCancelled ? 'line-through text-[var(--color-text-muted)]' : 'text-[var(--color-text)]'}`}
+            >
+              {title}
+            </span>
+            <StatusBadge status={status} />
+          </div>
+          {recapNote && (
+            <p className="mt-0.5 truncate text-xs text-[var(--color-text-muted)]">
+              {recapNote}
+            </p>
+          )}
+        </div>
       </div>
       <div className="flex flex-shrink-0 items-center gap-3 pl-3">
         {classes.length > 0 && (
@@ -300,12 +357,19 @@ function CardEventCard({
   image,
   slug,
   classes,
+  eventType,
+  status,
+  isFeatured,
 }: EventCardProps) {
   const { weekday, month, day } = formatDate(date);
   const timeDisplay = raceTime || gateTime || '';
+  const isCancelled = status === 'cancelled';
 
   return (
-    <Link href={`/events/${slug}`} className="group block flex-shrink-0 w-[280px] md:w-[300px]">
+    <Link
+      href={`/events/${slug}`}
+      className={`group block flex-shrink-0 w-[280px] md:w-[300px] ${isFeatured ? 'border-l-2 border-l-[var(--color-accent)] pl-3' : ''} ${isCancelled ? 'opacity-60' : ''}`}
+    >
       {/* Image */}
       <div className="relative aspect-[4/3] overflow-hidden rounded-lg bg-[var(--color-surface-dark)]">
         {image ? (
@@ -342,26 +406,45 @@ function CardEventCard({
             {weekday}
           </span>
         </div>
-        {/* Ticket badge */}
-        {ticketLink && (
-          <div className="absolute right-3 top-3">
+        {/* Top-right badges */}
+        <div className="absolute right-3 top-3 flex flex-col items-end gap-1">
+          {isFeatured && (
+            <span
+              className="rounded bg-[var(--color-surface-dark)] px-2 py-0.5 text-[8px] font-bold uppercase tracking-wider text-white"
+              style={{ fontFamily: 'var(--font-display)' }}
+            >
+              Featured
+            </span>
+          )}
+          {status === 'soldOut' ? (
+            <span
+              className="rounded bg-[var(--color-text-muted)] px-2.5 py-1 text-[9px] font-bold uppercase tracking-wider text-white"
+              style={{ fontFamily: 'var(--font-display)' }}
+            >
+              Sold Out
+            </span>
+          ) : ticketLink && !isCancelled ? (
             <span
               className="rounded bg-[var(--color-accent)] px-2.5 py-1 text-[9px] font-bold uppercase tracking-wider text-white"
               style={{ fontFamily: 'var(--font-display)' }}
             >
               Tickets
             </span>
-          </div>
-        )}
+          ) : null}
+          <StatusBadge status={status} />
+        </div>
       </div>
 
-      {/* Title */}
-      <h3
-        className="mt-3 text-sm font-bold uppercase leading-tight tracking-tight text-[var(--color-text)] transition-colors group-hover:text-[var(--color-accent)] md:text-base"
-        style={{ fontFamily: 'var(--font-display)' }}
-      >
-        {title}
-      </h3>
+      {/* Title + event type */}
+      <div className="mt-3 flex items-center gap-2">
+        <h3
+          className={`text-sm font-bold uppercase leading-tight tracking-tight transition-colors group-hover:text-[var(--color-accent)] md:text-base ${isCancelled ? 'line-through text-[var(--color-text-muted)]' : 'text-[var(--color-text)]'}`}
+          style={{ fontFamily: 'var(--font-display)' }}
+        >
+          {title}
+        </h3>
+        <EventTypeBadge eventType={eventType} />
+      </div>
 
       {/* Meta row */}
       <div className="mt-1.5 flex items-center gap-3 text-xs text-[var(--color-text-muted)]">

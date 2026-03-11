@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { sanityFetch } from '@/sanity/lib/fetch';
 import { upcomingEventsQuery, latestNewsQuery, sponsorsQuery, siteSettingsQuery } from '@/sanity/lib/queries';
+import type { SanityEvent } from '@/types/sanity';
 import { urlFor } from '@/sanity/lib/image';
 import {
   PageHero,
@@ -10,19 +11,8 @@ import {
   SponsorStrip,
 } from '@/components/ui';
 import FanProgramForm from './FanProgramForm';
+import EventsCarousel from './EventsCarousel';
 import { LocalBusinessJsonLd } from '@/components/seo/JsonLd';
-
-interface SanityEvent {
-  _id: string;
-  title: string;
-  slug: { current: string };
-  date: string;
-  gateTime?: string;
-  raceTime?: string;
-  raceClasses?: { sponsorName?: string; className: string }[];
-  image?: { asset: { _ref: string } };
-  ticketLink?: string;
-}
 
 interface SanityNewsPost {
   _id: string;
@@ -63,6 +53,9 @@ export default async function HomePage() {
     ticketLink: e.ticketLink,
     image: e.image ? urlFor(e.image).width(640).height(480).url() : undefined,
     slug: e.slug.current,
+    eventType: e.eventType,
+    status: e.status,
+    isFeatured: e.isFeatured,
   }));
 
   const latestNews = (posts || []).slice(0, 5).map((p) => ({
@@ -137,21 +130,7 @@ export default async function HomePage() {
           Upcoming Events
         </h2>
         {upcomingEvents.length > 0 ? (
-          <div className="relative">
-            <div className="flex gap-6 overflow-x-auto pb-4 scrollbar-hide">
-              {upcomingEvents.map((event) => (
-                <EventCard key={event.slug} {...event} />
-              ))}
-            </div>
-            {/* Right scroll arrow */}
-            {upcomingEvents.length > 3 && (
-              <div className="pointer-events-none absolute right-0 top-0 flex h-[75%] w-16 items-center justify-end bg-gradient-to-l from-white via-white/80 to-transparent">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--color-text)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
-                  <polyline points="9 18 15 12 9 6" />
-                </svg>
-              </div>
-            )}
-          </div>
+          <EventsCarousel events={upcomingEvents} />
         ) : (
           <p className="text-center text-sm text-[var(--color-text-muted)]">
             No upcoming events scheduled. Check back soon.

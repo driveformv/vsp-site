@@ -2,6 +2,61 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2026-03-11] - Events System Redesign (Phase 1-5)
+
+### Schema
+- Added `isFeatured` (boolean), `status` (scheduled/postponed/cancelled/completed/soldOut), `recapNote` (string) to Sanity event schema
+- Added `featuredUpcomingEventQuery` for hero section
+- Updated all GROQ queries to include new fields
+- Deprecated `weatherStatus` field (kept for backward compat)
+- Created shared `SanityEvent` type in `types/sanity.ts` (eliminates 3 duplicate interfaces)
+- Removed phantom `ticketPrice`/`pitPrice` from Event interface
+- Migration script: `scripts/migrate-events-schema.ts` (sets status based on date + weatherStatus)
+
+### Events Listing Page
+- **Next Race hero section** (dark variant) with CountdownTimer, large date, ticket CTA
+- Featured event selection: `isFeatured` flag, fallback to first upcoming
+- **Month filter** + **Event type tabs** (All/Weekly/Special) with client-side filtering
+- Status badges on upcoming events (POSTPONED yellow, CANCELLED red + strikethrough)
+- Event type pill (SPECIAL in red outline) on upcoming event rows
+- Past events with **Load More** button (20 at a time) and `recapNote` display
+
+### Event Detail Page
+- **Status-aware CTA bar** above the fold: red (upcoming/tickets), grey (completed + recap), yellow (postponed), red (cancelled)
+- Reordered content: schedule + admission info first (main column), description after
+- Completed events show recap note + link to /results
+- Removed hardcoded "Results & Photos" placeholder
+- Cross-link to /plan-your-visit for first-time visitors
+- Simplified sidebar: weather + watch live + tickets
+- **StickyMobileCTA** fixed bottom bar for mobile ticket purchase
+
+### EventCard Component
+- Added `eventType`, `status`, `isFeatured`, `recapNote` props
+- Status badges (cancelled, postponed, soldOut) on all variants
+- Event type badge (SPECIAL) on default + card variants
+- Featured treatment on card variant (left accent border + badge)
+- Cancelled events: strikethrough title + muted opacity
+- Sold Out events: grey "SOLD OUT" replaces ticket badge
+
+### Homepage
+- Event cards now pass `eventType`, `status`, `isFeatured` fields
+- Scroll arrow is now a functional button (EventsCarousel client component)
+- Uses shared `SanityEvent` type (removed local duplicate)
+
+### Validation
+- Fixed field names in AI validation prompt: `pitGatesTime`/`frontGatesTime`/`racesTime` -> `gateTime`/`raceTime`
+- Added `status` and `isFeatured` to validation data
+
+### New Files
+- `components/ui/CountdownTimer.tsx` - Orbitron countdown (Xd Xh Xm Xs)
+- `components/ui/StickyMobileCTA.tsx` - Mobile-only fixed ticket button
+- `app/(site)/events/EventsClient.tsx` - Client filters/load-more
+- `app/(site)/EventsCarousel.tsx` - Functional scroll carousel
+- `types/sanity.ts` - Shared Sanity event types
+- `scripts/migrate-events-schema.ts` - Schema migration
+
+---
+
 ## [2026-03-11] - Nav Logo Size + Points & Results Fixes
 
 ### UI
