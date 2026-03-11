@@ -2,10 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
-## [2026-03-11] - Fix Points & Results API 404 on Vercel
+## [2026-03-11] - Fix Points & Results Year Default + Coming Soon
 
 ### Bug Fixes
 - **Critical: Points & Results pages broken on Vercel.** `.vercelignore` contained `data/` (no leading slash) which matched `app/api/data/` and excluded the API route from deployment. Changed to `/data/` to anchor the pattern to the project root only. The `/api/data` endpoint now deploys correctly and both pages load data.
+- **Points & Results defaulting to 2025 instead of 2026.** Pages auto-selected the most recent year from data, which was 2025. Fixed to always default to the current season year (2026). The current year is always shown in the year filter chips even when no data exists yet.
+- **"Coming Soon" empty state.** When a selected year has no data, pages now show a clean "Coming Soon" message instead of a generic MUI alert. Matches the original app behavior.
 
 ---
 

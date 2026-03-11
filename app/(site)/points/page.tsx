@@ -113,7 +113,8 @@ export default function PointsPage() {
   const [filteredData, setFilteredData] = useState<ClassPoints[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedYear, setSelectedYear] = useState<string>('');
+  const currentSeasonYear = new Date().getFullYear().toString();
+  const [selectedYear, setSelectedYear] = useState<string>(currentSeasonYear);
   const [selectedClass, setSelectedClass] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [expandedClasses, setExpandedClasses] = useState<Set<string>>(new Set());
@@ -125,13 +126,14 @@ export default function PointsPage() {
 
   const availableYears = React.useMemo(() => {
     const years = new Set<string>();
+    years.add(currentSeasonYear);
     pointsData.forEach(cls => {
       if (cls.points_as_of) {
         years.add(cls.points_as_of.substring(0, 4));
       }
     });
     return Array.from(years).sort((a, b) => b.localeCompare(a));
-  }, [pointsData]);
+  }, [pointsData, currentSeasonYear]);
 
   const pointsForSelectedYear = React.useMemo(() => {
     return pointsData.filter(cls =>
@@ -155,12 +157,7 @@ export default function PointsPage() {
     return () => clearInterval(interval);
   }, []);
 
-  // Auto-select most recent year when data loads
-  useEffect(() => {
-    if (availableYears.length > 0 && !selectedYear) {
-      setSelectedYear(availableYears[0]);
-    }
-  }, [availableYears, selectedYear]);
+  // Keep currentSeasonYear selected by default - no auto-switch needed
 
   useEffect(() => {
     filterData();
@@ -364,7 +361,14 @@ export default function PointsPage() {
         {/* Content */}
         <Container maxWidth={false} sx={{ width: { xs: '100%', sm: '100%', md: '80%' }, mx: 'auto', px: { xs: 1, sm: 2 }, py: 2 }}>
           {filteredData.length === 0 ? (
-            <Alert severity="info">No results found matching your filters.</Alert>
+            <Box sx={{ textAlign: 'center', py: 8 }}>
+              <Typography variant="h2" sx={{ color: '#1d1d1f', mb: 2 }}>
+                Coming Soon
+              </Typography>
+              <Typography variant="body1" sx={{ color: '#86868b', fontSize: '18px', maxWidth: 480, mx: 'auto' }}>
+                {selectedYear} points standings will be posted here as the season progresses.
+              </Typography>
+            </Box>
           ) : (
             filteredData.map((classData) => (
               <Box key={classData.class_name} sx={{ mb: 6 }}>

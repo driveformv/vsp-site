@@ -122,7 +122,8 @@ export default function ResultsPage() {
   const [eventsData, setEventsData] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedYear, setSelectedYear] = useState<string>('');
+  const currentSeasonYear = new Date().getFullYear().toString();
+  const [selectedYear, setSelectedYear] = useState<string>(currentSeasonYear);
   const [selectedEvent, setSelectedEvent] = useState<string>('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [canScrollLeft, setCanScrollLeft] = useState(false);
@@ -133,13 +134,14 @@ export default function ResultsPage() {
 
   const availableYears = React.useMemo(() => {
     const years = new Set<string>();
+    years.add(currentSeasonYear);
     eventsData.forEach(event => {
       if (event.event_date) {
         years.add(event.event_date.substring(0, 4));
       }
     });
     return Array.from(years).sort((a, b) => b.localeCompare(a));
-  }, [eventsData]);
+  }, [eventsData, currentSeasonYear]);
 
   const eventsForSelectedYear = React.useMemo(() => {
     return eventsData.filter(event =>
@@ -153,12 +155,7 @@ export default function ResultsPage() {
     return () => clearInterval(interval);
   }, []);
 
-  // Auto-select most recent year when data loads
-  useEffect(() => {
-    if (availableYears.length > 0 && !selectedYear) {
-      setSelectedYear(availableYears[0]);
-    }
-  }, [availableYears, selectedYear]);
+  // Keep currentSeasonYear selected by default - no auto-switch needed
 
   useEffect(() => {
     checkScrollButtons();
@@ -399,7 +396,14 @@ export default function ResultsPage() {
         {/* Content */}
         <Container maxWidth={false} sx={{ px: { xs: 1, sm: 2 }, py: 2, width: { xs: '100%', sm: '100%', md: '80%' }, mx: 'auto' }}>
           {filteredEvents.length === 0 ? (
-            <Alert severity="info">No race results available.</Alert>
+            <Box sx={{ textAlign: 'center', py: 8 }}>
+              <Typography variant="h2" sx={{ color: '#1d1d1f', mb: 2 }}>
+                Coming Soon
+              </Typography>
+              <Typography variant="body1" sx={{ color: '#86868b', fontSize: '18px', maxWidth: 480, mx: 'auto' }}>
+                {selectedYear} race results will be posted here as events are completed.
+              </Typography>
+            </Box>
           ) : (
             <Stack spacing={3}>
               {filteredEvents.map((event) => (
