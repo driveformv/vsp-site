@@ -105,7 +105,7 @@ export default function PointsPage() {
   const [filteredData, setFilteredData] = useState<ClassPoints[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedYear, setSelectedYear] = useState<string>('2026');
+  const [selectedYear, setSelectedYear] = useState<string>('');
   const [selectedClass, setSelectedClass] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [expandedClasses, setExpandedClasses] = useState<Set<string>>(new Set());
@@ -146,6 +146,13 @@ export default function PointsPage() {
     const interval = setInterval(loadPoints, 5 * 60 * 1000);
     return () => clearInterval(interval);
   }, []);
+
+  // Auto-select most recent year when data loads
+  useEffect(() => {
+    if (availableYears.length > 0 && !selectedYear) {
+      setSelectedYear(availableYears[0]);
+    }
+  }, [availableYears, selectedYear]);
 
   useEffect(() => {
     filterData();

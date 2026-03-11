@@ -104,7 +104,7 @@ export default function ResultsPage() {
   const [eventsData, setEventsData] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedYear, setSelectedYear] = useState<string>('2026');
+  const [selectedYear, setSelectedYear] = useState<string>('');
   const [selectedEvent, setSelectedEvent] = useState<string>('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [canScrollLeft, setCanScrollLeft] = useState(false);
@@ -134,6 +134,13 @@ export default function ResultsPage() {
     const interval = setInterval(loadResults, 5 * 60 * 1000);
     return () => clearInterval(interval);
   }, []);
+
+  // Auto-select most recent year when data loads
+  useEffect(() => {
+    if (availableYears.length > 0 && !selectedYear) {
+      setSelectedYear(availableYears[0]);
+    }
+  }, [availableYears, selectedYear]);
 
   useEffect(() => {
     checkScrollButtons();

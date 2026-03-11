@@ -1,5 +1,20 @@
 # Changelog - VSP Website
 
+## 2026-03-10 (Event Featured Images Import)
+
+### WordPress Event Image Migration
+- Scraped 164 unique `og:image` URLs from live WordPress event pages
+- Matched 162 images to local files in `wp-media/` directory (downloaded from Kinsta)
+- Uploaded all 162 unique images to Sanity CDN
+- Patched 222 out of 225 Sanity event documents with image references (3 events had no featured image in WordPress)
+- Events now display real race photos and event flyers instead of dark VSP placeholders
+
+### Scripts Added
+- `scripts/scrape-event-images.py` - Scrapes WordPress event pages for `og:image`, maps `_thumbnail_id` to local files
+- `scripts/upload-event-images.py` - Uploads images to Sanity CDN and patches event documents
+
+---
+
 ## 2026-03-10 (Mockup Matching + Build Reliability)
 
 ### Mockup Layout Match
