@@ -26,8 +26,8 @@ interface EventsClientProps {
 const PAST_PAGE_SIZE = 20;
 
 function getMonthKey(dateStr: string): string {
-  const d = new Date(dateStr);
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+  const [year, month] = dateStr.split('T')[0].split('-');
+  return `${year}-${month}`;
 }
 
 function getMonthLabel(key: string): string {
@@ -52,16 +52,20 @@ export function EventsClient({ upcomingEvents, pastEvents }: EventsClientProps) 
   const allEvents = useMemo(() => [...upcomingEvents, ...pastEvents], [upcomingEvents, pastEvents]);
   const months = useMemo(() => collectMonths(allEvents), [allEvents]);
 
-  function filterEvents(events: MappedEvent[]): MappedEvent[] {
-    return events.filter((e) => {
+  const filteredUpcoming = useMemo(() => {
+    return upcomingEvents.filter((e) => {
       if (selectedMonth && getMonthKey(e.date) !== selectedMonth) return false;
       if (selectedType !== 'all' && (e.eventType || 'weekly') !== selectedType) return false;
       return true;
     });
-  }
-
-  const filteredUpcoming = useMemo(() => filterEvents(upcomingEvents), [upcomingEvents, selectedMonth, selectedType]);
-  const filteredPast = useMemo(() => filterEvents(pastEvents), [pastEvents, selectedMonth, selectedType]);
+  }, [upcomingEvents, selectedMonth, selectedType]);
+  const filteredPast = useMemo(() => {
+    return pastEvents.filter((e) => {
+      if (selectedMonth && getMonthKey(e.date) !== selectedMonth) return false;
+      if (selectedType !== 'all' && (e.eventType || 'weekly') !== selectedType) return false;
+      return true;
+    });
+  }, [pastEvents, selectedMonth, selectedType]);
   const visiblePast = filteredPast.slice(0, pastVisible);
   const hasMorePast = filteredPast.length > pastVisible;
 

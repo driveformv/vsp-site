@@ -49,8 +49,8 @@ export default async function EventsPage() {
   const featuredRaw = featured || (upcoming && upcoming.length > 0 ? upcoming[0] : null);
   const heroEvent = featuredRaw ? mapEvent(featuredRaw) : null;
   const heroDate = heroEvent ? formatHeroDate(heroEvent.date) : null;
-  const heroImage = heroEvent?.image
-    ? heroEvent.image.replace('1080x1080', '1920x1080')
+  const heroImage = featuredRaw?.image
+    ? urlFor(featuredRaw.image).width(1920).height(1080).url()
     : undefined;
 
   return (

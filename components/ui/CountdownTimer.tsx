@@ -7,7 +7,9 @@ interface CountdownTimerProps {
 }
 
 function calculateTimeLeft(target: string) {
-  const diff = new Date(target).getTime() - Date.now();
+  const targetTime = new Date(target).getTime();
+  if (isNaN(targetTime)) return null;
+  const diff = targetTime - Date.now();
   if (diff <= 0) return null;
 
   const days = Math.floor(diff / (1000 * 60 * 60 * 24));
