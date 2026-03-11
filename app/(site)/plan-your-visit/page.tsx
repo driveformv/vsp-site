@@ -182,7 +182,17 @@ export default async function PlanYourVisitPage() {
               { label: 'Seniors (62+)', price: '$12' },
               { label: 'Kids (12 & under)', price: 'Free' },
               { label: 'Pit Pass', price: '$35' },
-              { label: 'Season Pass', price: 'Contact Office' },
+              {
+                label: 'Season Pass',
+                price: (
+                  <a
+                    href={`tel:${settings?.phone || '5755247913'}`}
+                    className="text-[var(--color-accent)] underline underline-offset-4"
+                  >
+                    Contact Office
+                  </a>
+                ),
+              },
             ].map(({ label, price }) => (
               <div key={label} className="flex items-center justify-between px-5 py-3 text-sm">
                 <span className="text-[var(--color-text)]">{label}</span>

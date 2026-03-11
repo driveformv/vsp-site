@@ -108,17 +108,17 @@ export default function Footer({
           </div>
 
           {/* Social icons */}
-          <div className="flex items-center gap-4">
-            <a href={youtubeUrl} target="_blank" rel="noopener noreferrer" className="text-white transition-opacity hover:opacity-70" aria-label="YouTube">
+          <div className="flex items-center gap-2 md:gap-4">
+            <a href={youtubeUrl} target="_blank" rel="noopener noreferrer" className="p-2 text-white transition-opacity hover:opacity-70" aria-label="YouTube">
               <YouTubeIcon />
             </a>
-            <a href={facebookUrl} target="_blank" rel="noopener noreferrer" className="text-white transition-opacity hover:opacity-70" aria-label="Facebook">
+            <a href={facebookUrl} target="_blank" rel="noopener noreferrer" className="p-2 text-white transition-opacity hover:opacity-70" aria-label="Facebook">
               <FacebookIcon />
             </a>
-            <a href={twitterUrl} target="_blank" rel="noopener noreferrer" className="text-white transition-opacity hover:opacity-70" aria-label="X">
+            <a href={twitterUrl} target="_blank" rel="noopener noreferrer" className="p-2 text-white transition-opacity hover:opacity-70" aria-label="X">
               <XIcon />
             </a>
-            <a href={instagramUrl} target="_blank" rel="noopener noreferrer" className="text-white transition-opacity hover:opacity-70" aria-label="Instagram">
+            <a href={instagramUrl} target="_blank" rel="noopener noreferrer" className="p-2 text-white transition-opacity hover:opacity-70" aria-label="Instagram">
               <InstagramIcon />
             </a>
           </div>

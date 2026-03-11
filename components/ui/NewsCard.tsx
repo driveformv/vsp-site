@@ -10,14 +10,14 @@ interface NewsCardProps {
 }
 
 const categoryColors: Record<string, string> = {
-  Results: 'bg-[var(--color-accent)] text-white',
-  Announcement: 'bg-[var(--color-surface-dark)] text-white',
-  Feature: 'bg-[var(--color-accent-secondary)] text-black',
-  Default: 'bg-[var(--color-surface-alt)] text-[var(--color-text)]',
+  recap: 'bg-[var(--color-accent)] text-white',
+  announcement: 'bg-[var(--color-surface-dark)] text-white',
+  feature: 'bg-[var(--color-accent-secondary)] text-black',
+  news: 'bg-[var(--color-surface-alt)] text-[var(--color-text)]',
 };
 
 function getCategoryStyle(category: string) {
-  return categoryColors[category] || categoryColors.Default;
+  return categoryColors[category] || categoryColors.news;
 }
 
 export function NewsCard({

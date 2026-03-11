@@ -69,13 +69,13 @@ export default function StickyNav({
           backgroundColor: isTransparent ? 'transparent' : 'var(--color-surface)',
         }}
       >
-        <div className="mx-auto flex items-center justify-between px-6 py-3" style={{ maxWidth: 1280 }}>
+        <div className="mx-auto flex items-center justify-between px-6 py-2 md:py-3" style={{ maxWidth: 1280 }}>
           {/* Logo */}
           <Link href="/" className="shrink-0">
             <img
               src={vspLogoDataUrl}
               alt="Vado Speedway Park"
-              className="h-12 w-auto"
+              className="h-10 w-auto md:h-12"
             />
           </Link>
 
@@ -164,8 +164,9 @@ export default function StickyNav({
           </button>
         </div>
 
-        {/* Red accent bar with tagline */}
+        {/* Red accent bar with tagline - Hidden on mobile */}
         <div
+          className="hidden md:block"
           style={{ backgroundColor: 'var(--color-accent)' }}
         >
           <div className="mx-auto px-6 py-1 text-center text-[10px] font-bold uppercase tracking-widest text-white" style={{ maxWidth: 1280, fontFamily: 'var(--font-body)' }}>
