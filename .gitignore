@@ -42,6 +42,9 @@ wp-content-inventory/
 # media downloads (9.3 GB from WordPress)
 wp-media/
 
+# worktrees
+.worktrees/
+
 # vercel
 .vercel
 
