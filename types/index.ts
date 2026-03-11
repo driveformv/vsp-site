@@ -8,13 +8,15 @@ export interface Event {
   description?: string;
   image?: string;
   classes: string[];
-  ticketPrice?: number;
-  pitPrice?: number;
-  status: "upcoming" | "completed" | "cancelled" | "postponed";
-  featured: boolean;
+  status: "scheduled" | "completed" | "cancelled" | "postponed" | "soldOut";
+  isFeatured: boolean;
+  eventType?: "weekly" | "special" | "practice" | "external";
+  recapNote?: string;
   createdAt: string;
   updatedAt: string;
 }
+
+export type { SanityEvent, EventStatus, EventType } from './sanity';
 
 export interface NewsPost {
   id: string;

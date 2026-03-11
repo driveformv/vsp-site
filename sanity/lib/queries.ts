@@ -18,7 +18,10 @@ export const upcomingEventsQuery = groq`
     eventType,
     isExternal,
     externalUrl,
-    weatherStatus
+    weatherStatus,
+    isFeatured,
+    status,
+    recapNote
   }
 `;
 
@@ -33,8 +36,15 @@ export const pastEventsQuery = groq`
     raceClasses,
     image,
     ticketLink,
+    streamLink,
+    admissionInfo,
     eventType,
-    weatherStatus
+    isExternal,
+    externalUrl,
+    weatherStatus,
+    isFeatured,
+    status,
+    recapNote
   }
 `;
 
@@ -55,7 +65,29 @@ export const eventBySlugQuery = groq`
     isExternal,
     externalUrl,
     weatherStatus,
+    isFeatured,
+    status,
+    recapNote,
     description
+  }
+`;
+
+export const featuredUpcomingEventQuery = groq`
+  *[_type == "event" && isFeatured == true && date >= now()] | order(date asc)[0] {
+    _id,
+    title,
+    slug,
+    date,
+    gateTime,
+    raceTime,
+    raceClasses,
+    image,
+    ticketLink,
+    streamLink,
+    admissionInfo,
+    eventType,
+    isFeatured,
+    status
   }
 `;
 

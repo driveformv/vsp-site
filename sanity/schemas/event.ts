@@ -106,9 +106,38 @@ export default defineType({
       hidden: ({document}) => !document?.isExternal,
     }),
     defineField({
-      name: 'weatherStatus',
-      title: 'Weather Status',
+      name: 'isFeatured',
+      title: 'Featured Event',
+      type: 'boolean',
+      description: 'Flag major events for hero treatment on the schedule page',
+      initialValue: false,
+    }),
+    defineField({
+      name: 'status',
+      title: 'Status',
       type: 'string',
+      options: {
+        list: [
+          {title: 'Scheduled', value: 'scheduled'},
+          {title: 'Postponed', value: 'postponed'},
+          {title: 'Cancelled', value: 'cancelled'},
+          {title: 'Completed', value: 'completed'},
+          {title: 'Sold Out', value: 'soldOut'},
+        ],
+      },
+      initialValue: 'scheduled',
+    }),
+    defineField({
+      name: 'recapNote',
+      title: 'Recap Note',
+      type: 'string',
+      description: 'One-line post-race note (e.g. "John Doe wins Modified feature")',
+    }),
+    defineField({
+      name: 'weatherStatus',
+      title: 'Weather Status (Deprecated)',
+      type: 'string',
+      description: 'Deprecated: use Status field instead. Kept for backward compatibility.',
       options: {
         list: [
           {title: 'Normal', value: 'normal'},
