@@ -1,5 +1,5 @@
 wp-media/
-data/
+/data/
 scripts/
 wp-content-inventory/
 *.docx

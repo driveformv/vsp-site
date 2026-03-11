@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2026-03-11] - Fix Points & Results API 404 on Vercel
+
+### Bug Fixes
+- **Critical: Points & Results pages broken on Vercel.** `.vercelignore` contained `data/` (no leading slash) which matched `app/api/data/` and excluded the API route from deployment. Changed to `/data/` to anchor the pattern to the project root only. The `/api/data` endpoint now deploys correctly and both pages load data.
+
+---
+
+## [2026-03-11] - Date Timezone Fix & MUI SSR Support
+
+### Bug Fixes
+- **Timezone date shift:** Replaced `new Date()` constructor-based date formatting in points and results pages with manual YYYY-MM-DD string parsing to prevent off-by-one-day bugs across timezones
+- **MUI hydration mismatch:** Added `@mui/material-nextjs` with `AppRouterCacheProvider` and layout wrappers for `/points` and `/results` routes for proper server-side rendering
+
+### Dependencies
+- Added `@emotion/cache` ^11.14.0
+- Added `@mui/material-nextjs` ^7.3.9
+
+---
+
 ## [2026-03-11] - Events Redesign, Verification & QA
 
 ### Events Page Redesign
