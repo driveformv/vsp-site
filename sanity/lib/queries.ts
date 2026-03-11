@@ -87,12 +87,14 @@ export const featuredUpcomingEventQuery = groq`
     admissionInfo,
     eventType,
     isFeatured,
-    status
+    status,
+    recapNote,
+    weatherStatus
   }
 `;
 
 export const eventSlugsQuery = groq`
-  *[_type == "event" && defined(slug.current)].slug.current
+  *[_type == "event" && defined(slug.current)] | order(date desc) .slug.current
 `;
 
 // === News ===

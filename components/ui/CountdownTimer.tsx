@@ -23,15 +23,28 @@ function pad(n: number): string {
 }
 
 export function CountdownTimer({ targetDate }: CountdownTimerProps) {
-  const [timeLeft, setTimeLeft] = useState(calculateTimeLeft(targetDate));
+  const [timeLeft, setTimeLeft] = useState<ReturnType<typeof calculateTimeLeft> | undefined>(undefined);
 
   useEffect(() => {
+    setTimeLeft(calculateTimeLeft(targetDate));
     const timer = setInterval(() => {
       setTimeLeft(calculateTimeLeft(targetDate));
     }, 1000);
 
     return () => clearInterval(timer);
   }, [targetDate]);
+
+  // Render nothing on server / first client paint to avoid hydration mismatch
+  if (timeLeft === undefined) {
+    return (
+      <span
+        className="text-lg font-bold tracking-wider text-white/40 md:text-2xl"
+        style={{ fontFamily: 'var(--font-mono)' }}
+      >
+        --d --h --m --s
+      </span>
+    );
+  }
 
   if (!timeLeft) {
     return (

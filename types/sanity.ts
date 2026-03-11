@@ -18,7 +18,7 @@ export interface SanityEvent {
   eventType?: EventType;
   isExternal?: boolean;
   externalUrl?: string;
-  weatherStatus?: string;
+  weatherStatus?: 'normal' | 'delayed' | 'cancelled' | 'tbd';
   isFeatured?: boolean;
   status?: EventStatus;
   recapNote?: string;
